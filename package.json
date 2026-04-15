@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.61.4",
     "@hookform/resolvers": "^3.10.0",
     "@jordan6699/washlab-backend": "^1.1.61",
     "@mediapipe/camera_utils": "^0.3.1675466862",
