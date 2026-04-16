@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "WashLab Attendant ",
-  description: "WashLab Attendant Point of Sale System",
+  title: "Jarvis Attendant ",
+  description: "Jarvis Attendant Point of Sale System",
 };
 
 export default function RootLayout({

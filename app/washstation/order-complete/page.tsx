@@ -64,9 +64,9 @@ function OrderCompleteContent() {
       ? `Original: GHS ${order.basePrice.toFixed(2)}\nDiscount: -GHS ${(order.basePrice - order.finalPrice).toFixed(2)}\n`
       : '';
     const msg =
-      `🧺 WashLab Receipt\n\n` +
+      `🧺 Jarvis Receipt\n\n` +
       `Hi ${name},\n` +
-      `Thank you for using WashLab!\n\n` +
+      `Thank you for using Jarvis!\n\n` +
       `Order: *#${num}*\n` +
       `Service: ${serviceDesc}\n` +
       `Wash Cycles: *${loads} load${loads !== 1 ? 's' : ''}*\n` +

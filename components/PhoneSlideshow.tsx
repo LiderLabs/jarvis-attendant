@@ -17,7 +17,7 @@ const slides: Slide[] = [
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
             <span className="text-primary font-bold text-lg">W</span>
           </div>
-          <p className="font-semibold text-foreground">WashLab</p>
+          <p className="font-semibold text-foreground">Jarvis</p>
         </div>
         <p className="text-sm font-semibold text-foreground">Place Order</p>
         <div className="space-y-3">
@@ -54,7 +54,7 @@ const slides: Slide[] = [
         </div>
         <div className="bg-muted/50 rounded-xl p-4 text-left">
           <p className="text-xs text-muted-foreground mb-2">Next step:</p>
-          <p className="text-sm font-medium">Bring your clothes to WashLab</p>
+          <p className="text-sm font-medium">Bring your clothes to Jarvis</p>
           <p className="text-xs text-muted-foreground mt-1">Show this code at the counter</p>
         </div>
       </div>
@@ -146,7 +146,7 @@ const slides: Slide[] = [
         <button className="w-full flex items-center gap-3 p-4 rounded-xl border-2 border-primary bg-primary/5 text-left">
           <MapPin className="w-5 h-5 text-primary" />
           <div>
-            <p className="font-medium text-foreground">Pickup at WashLab</p>
+            <p className="font-medium text-foreground">Pickup at Jarvis</p>
             <p className="text-xs text-muted-foreground">Main Campus • Open now</p>
           </div>
         </button>
