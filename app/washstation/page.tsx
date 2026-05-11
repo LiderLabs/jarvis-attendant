@@ -26,8 +26,8 @@ export default function BranchEntryPage() {
   // Redirect to dashboard if already logged in
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const activeStaff = sessionStorage.getItem('washlab_active_staff');
-    const branch = sessionStorage.getItem('washlab_branch');
+    const activeStaff = sessionStorage.getItem('Javis_active_staff');
+    const branch = sessionStorage.getItem('Javis_branch');
     if (activeStaff && branch) {
       router.push('/washstation/dashboard');
     }
@@ -49,7 +49,7 @@ export default function BranchEntryPage() {
     
     // Store branch in session with consistent key
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('washlab_branch', JSON.stringify(selectedBranch));
+      sessionStorage.setItem('Javis_branch', JSON.stringify(selectedBranch));
     }
     router.push('/washstation/scan');
   };
@@ -69,9 +69,6 @@ export default function BranchEntryPage() {
               <Building2 className="w-8 h-8 text-primary" />
             </div>
 
-            <h1 className="text-2xl font-bold text-center text-foreground mb-2">
-              WashStation
-            </h1>
             <p className="text-center text-muted-foreground mb-8">
               Enter your branch code to begin
             </p>
@@ -124,7 +121,7 @@ export default function BranchEntryPage() {
       {/* Footer */}
       <footer className="p-6 text-center">
         <p className="text-white/60 text-sm">
-          © 2026 WashLab · Powered by Lider Technologies LTD
+          © 2026 Javis · Powered by Lider Technologies LTD
         </p>
       </footer>
     </div>

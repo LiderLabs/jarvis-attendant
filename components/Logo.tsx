@@ -30,19 +30,24 @@ export const Logo = ({ className, size = 'md' }: LogoProps) => {
 
   const logoSrc =
     resolvedTheme === 'dark'
-      ? '/assets/washlab-logo-dark.png'
-      : '/assets/washlab-logo-light.png';
+      ? '/assets/javis.png'
+      : '/assets/javis.png';
 
   return (
-    <div className={cn('flex items-center', className)}>
+    <div className={cn('flex items-center items-center', className)} >
       <Image
         src={logoSrc}
-        alt="WashLab - Life made simple"
+        alt="Javis - Life made simple"
         height={height}
         width={width}
-        className="w-auto h-auto"
+        className="w-auto" 
         priority
       />
     </div>
   );
 };
+
+
+
+
+
