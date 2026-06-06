@@ -189,6 +189,10 @@ export function NewOrderContent() {
   const [bagCardNumber, setBagCardNumber] = useState("")
   const [extraWashLoads, setExtraWashLoads] = useState(0)
   const [extraDryLoads, setExtraDryLoads] = useState(0)
+  const [isDelivery, setIsDelivery] = useState(false)
+  const [deliveryAddress, setDeliveryAddress] = useState("")
+  const [deliveryHall, setDeliveryHall] = useState("")
+  const [deliveryRoom, setDeliveryRoom] = useState("")
   const [selectedMachineId, setSelectedMachineId] = useState<string | null>(null)
 
   const activeBagNumbers =
@@ -196,6 +200,8 @@ export function NewOrderContent() {
       api.stations.getActiveBagNumbers,
       stationToken && isSessionValid ? { stationToken } : "skip"
     ) ?? []
+  const branchInfo = useQuery((api as any).stations.getStationInfo, stationToken ? { stationToken } : "skip")
+  const deliveryFee = isDelivery ? ((branchInfo as any)?.deliveryFee ?? 0) : 0
 
   const [orderId] = useState(
     () => `ORD-${Math.floor(Math.random() * 9000) + 1000}`
@@ -310,11 +316,14 @@ export function NewOrderContent() {
         itemCount: itemCount || 1,
         bagCardNumber,
         notes: [customNote, ...orderNotes, extraWashLoads > 0 ? extraWashLoads + ' extra wash load(s)' : '', extraDryLoads > 0 ? extraDryLoads + ' extra dry load(s)' : ''].filter(Boolean).join(', ') || undefined,
-        isDelivery: false,
         extraWashLoads: extraWashLoads > 0 ? extraWashLoads : undefined,
         extraDryLoads: extraDryLoads > 0 ? extraDryLoads : undefined,
         machineId: selectedMachineId ?? undefined,
         attendantId: loggedInAttendantId ?? undefined,
+        isDelivery,
+        deliveryAddress: isDelivery && deliveryAddress ? deliveryAddress : undefined,
+        deliveryHall: isDelivery && deliveryHall ? deliveryHall : undefined,
+        deliveryRoom: isDelivery && deliveryRoom ? deliveryRoom : undefined,
       })
       toast.success(`Order created successfully! Bag #${result.bagCardNumber}`)
       router.push(`/washstation/payment?orderId=${result.orderId}&return=order`)
@@ -381,7 +390,7 @@ export function NewOrderContent() {
 
   const pricing    = calculatePrice()
   const rushFee    = orderNotes.includes("Rush Service") ? 5 : 0
-  const finalTotal = pricing.total + rushFee
+  const finalTotal = pricing.total + rushFee + deliveryFee
 
   const services = dbServices.map((s: any) => ({
     id:       s.code,
@@ -878,6 +887,12 @@ export function NewOrderContent() {
                     </>
                   ) : null}
                 </div>
+                {isDelivery && deliveryFee > 0 && (
+                  <div className='flex justify-between'>
+                    <span className='text-foreground flex items-center gap-1 text-sm sm:text-base'>🚚 Delivery Fee</span>
+                    <span className='text-foreground text-sm sm:text-base'>₵{deliveryFee.toFixed(2)}</span>
+                  </div>
+                )}
                 {orderNotes.includes("Rush Service") && (
                   <div className='flex justify-between'>
                     <span className='text-foreground flex items-center gap-1 text-sm sm:text-base'>Rush Fee <Clock className='w-3 h-3 sm:w-4 sm:h-4' /></span>
@@ -903,7 +918,7 @@ export function NewOrderContent() {
               </div>
               <Button
                 onClick={handleProceedToPayment}
-                disabled={weight < 0.1 || !bagCardNumber.trim()}
+                disabled={weight < 0.1 || !bagCardNumber.trim() || (isDelivery && !deliveryHall && !deliveryAddress)}
                 className='w-full h-11 sm:h-12 bg-primary text-primary-foreground rounded-xl font-semibold mb-3 text-sm sm:text-base disabled:opacity-50 disabled:pointer-events-none'
               >
                 Proceed to Payment <ArrowRight className='w-4 h-4 ml-2' />
@@ -915,3 +930,7 @@ export function NewOrderContent() {
     </>
   )
 }
+
+
+
+
