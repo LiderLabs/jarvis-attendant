@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -12,7 +12,7 @@ import { Id } from "@jordan6699/washlab-backend/dataModel"
 import {
   Search, Phone, Mail, Minus, Plus, Scale, Package,
   ShoppingBag, Trash2, MessageSquare, ArrowRight,
-  User, ChevronLeft, ArrowLeft,
+  User, ChevronLeft, ArrowLeft, Truck, MapPin,
 } from "lucide-react"
 import { toast } from "sonner"
 import { LoadingSpinner } from "@/components/washstation/LoadingSpinner"
@@ -267,7 +267,7 @@ export function OnlineOrdersContent() {
 
   if (!isSessionValid) return <LoadingSpinner text="Verifying session..." />
 
-  // ── Queue Panel ──────────────────────────────────────────────────────────
+  // â”€â”€ Queue Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const QueuePanel = (
     <div className={`
       ${mobileView === "queue" ? "flex" : "hidden"}
@@ -313,10 +313,10 @@ export function OnlineOrdersContent() {
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="text-primary font-medium">#{order.orderNumber}</span>
-                <span>·</span>
+                <span>Â·</span>
                 <span className="truncate">{getServiceName(order.serviceType || "wash_and_fold")}</span>
-                {order.isDelivery && <><span>·</span><span className="text-amber-500">Delivery</span></>}
-                {order.finalPrice < order.totalPrice && <><span>·</span><span className="text-purple-500">🎁 Loyalty</span></>}
+                {order.isDelivery && <><span>Â·</span><span className="text-amber-500">Delivery</span></>}
+                {order.finalPrice < order.totalPrice && <><span>Â·</span><span className="text-purple-500">ðŸŽ Loyalty</span></>}
               </div>
             </button>
           ))
@@ -330,7 +330,7 @@ export function OnlineOrdersContent() {
     </div>
   )
 
-    // ── Detail Panel ─────────────────────────────────────────────────────────
+    // â”€â”€ Detail Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const DetailPanel = selectedOrder ? (
     <div className={`
       ${mobileView === "detail" ? "flex" : "hidden"}
@@ -368,6 +368,28 @@ export function OnlineOrdersContent() {
             </div>
           </div>
         </div>
+
+        {/* Delivery Banner */}
+        {selectedOrder.isDelivery && (
+          <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+            <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-800 flex items-center justify-center flex-shrink-0">
+              <Truck className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">Delivery Order</p>
+              <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5 flex items-center gap-1">
+                <MapPin className="w-3 h-3 flex-shrink-0" />
+                {selectedOrder.deliveryHall
+                  ? `${selectedOrder.deliveryHall}${selectedOrder.deliveryRoom ? ", Rm " + selectedOrder.deliveryRoom : ""}`
+                  : selectedOrder.deliveryAddress || "Address on file"}
+              </p>
+              <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
+                After payment → Mark Ready for Delivery so driver can collect
+              </p>
+            </div>
+          </div>
+        )}
+
 
         <div>
           <p className="text-xs text-muted-foreground">Order ID</p>
@@ -423,10 +445,10 @@ export function OnlineOrdersContent() {
 
         {selectedOrder.finalPrice < selectedOrder.totalPrice && (
           <div className="flex items-center gap-2 p-3 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-            <span className="text-lg">🎁</span>
+            <span className="text-lg">ðŸŽ</span>
             <div>
               <p className="text-sm font-semibold text-purple-700 dark:text-purple-400">Loyalty Reward Applied</p>
-              <p className="text-xs text-muted-foreground">Customer saved GHS {(selectedOrder.totalPrice - selectedOrder.finalPrice).toFixed(2)} — Total due: GHS {selectedOrder.finalPrice.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Customer saved GHS {(selectedOrder.totalPrice - selectedOrder.finalPrice).toFixed(2)} â€” Total due: GHS {selectedOrder.finalPrice.toFixed(2)}</p>
             </div>
           </div>
         )}
@@ -482,7 +504,7 @@ export function OnlineOrdersContent() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Extra Wash</span>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setExtraWashLoads(Math.max(0, extraWashLoads - 1))} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-sm font-bold hover:bg-muted/80">−</button>
+                  <button onClick={() => setExtraWashLoads(Math.max(0, extraWashLoads - 1))} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-sm font-bold hover:bg-muted/80">âˆ’</button>
                   <span className="text-sm font-bold w-5 text-center">{extraWashLoads}</span>
                   <button onClick={() => setExtraWashLoads(extraWashLoads + 1)} className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold hover:bg-primary/90">+</button>
                 </div>
@@ -492,7 +514,7 @@ export function OnlineOrdersContent() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Extra Dry</span>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setExtraDryLoads(Math.max(0, extraDryLoads - 1))} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-sm font-bold hover:bg-muted/80">−</button>
+                  <button onClick={() => setExtraDryLoads(Math.max(0, extraDryLoads - 1))} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-sm font-bold hover:bg-muted/80">âˆ’</button>
                   <span className="text-sm font-bold w-5 text-center">{extraDryLoads}</span>
                   <button onClick={() => setExtraDryLoads(extraDryLoads + 1)} className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold hover:bg-primary/90">+</button>
                 </div>
@@ -527,7 +549,7 @@ export function OnlineOrdersContent() {
           {bagCardNumber && (
             <div className="mt-2 p-2.5 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
               <p className="text-sm text-green-700 dark:text-green-400 font-medium">
-                ✓ Card #{bagCardNumber} selected — Give matching card to customer
+                âœ“ Card #{bagCardNumber} selected â€” Give matching card to customer
               </p>
             </div>
           )}
@@ -556,7 +578,7 @@ export function OnlineOrdersContent() {
                     onClick={() => setOverriddenServiceType(svc.code === selectedOrder.serviceType ? null : svc.code)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium border-2 transition-all ${isActive ? "border-primary bg-primary/10 text-primary" : "border-border bg-muted text-muted-foreground"}`}
                   >
-                    {svc.name} · ₵{(svc.price ?? svc.basePrice ?? 0).toFixed(2)}
+                    {svc.name} Â· â‚µ{(svc.price ?? svc.basePrice ?? 0).toFixed(2)}
                     {!svc.showOnCustomerSide && <span className="ml-1 opacity-60">(staff)</span>}
                   </button>
                 )
@@ -565,14 +587,14 @@ export function OnlineOrdersContent() {
             {overriddenServiceType && overriddenServiceType !== selectedOrder.serviceType && (
               <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 rounded-lg">
                 <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
-                  ⚠️ Service overridden — pricing and history will reflect the new service
+                  âš ï¸ Service overridden â€” pricing and history will reflect the new service
                 </p>
               </div>
             )}
           </div>
         )}
 
-        {/* Order Summary — bottom of page */}
+        {/* Order Summary â€” bottom of page */}
         <div className="bg-card border border-border rounded-xl p-4">
           <h3 className="font-semibold text-foreground mb-3">Order Summary</h3>
           <div className="space-y-2.5 text-sm">
@@ -582,13 +604,13 @@ export function OnlineOrdersContent() {
             </div>
             {selectedOrder.whitesSeparate && (
               <div className="flex justify-between items-center bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
-                <span className="text-yellow-800 font-medium text-sm">⚠️ Whites Separate</span>
+                <span className="text-yellow-800 font-medium text-sm">âš ï¸ Whites Separate</span>
                 <span className="text-yellow-800 font-medium text-sm">+1 extra load</span>
               </div>
             )}
             {(selectedOrder as any).mixWithColors && (
               <div className="flex justify-between items-center bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-                <span className="text-blue-800 font-medium text-sm">🎨 Mix with Colors</span>
+                <span className="text-blue-800 font-medium text-sm">ðŸŽ¨ Mix with Colors</span>
                 <span className="text-blue-800 font-medium text-sm">Wash together</span>
               </div>
             )}
@@ -606,24 +628,24 @@ export function OnlineOrdersContent() {
               <>
                 <div className="border-t border-border pt-2 space-y-1.5">
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{pricing.numberOfLoads} load{pricing.numberOfLoads !== 1 ? "s" : ""} × GHS {pricing.pricePerLoad.toFixed(2)}</span>
+                    <span>{pricing.numberOfLoads} load{pricing.numberOfLoads !== 1 ? "s" : ""} Ã— GHS {pricing.pricePerLoad.toFixed(2)}</span>
                     <span>GHS {(pricing.numberOfLoads * pricing.pricePerLoad).toFixed(2)}</span>
                   </div>
                   {pricing.whitesExtraLoad > 0 && (
                     <div className="flex justify-between text-xs bg-yellow-50 text-yellow-800 rounded px-1 py-0.5">
-                      <span>⚠️ Whites separate (+{pricing.whitesExtraLoad} load)</span>
+                      <span>âš ï¸ Whites separate (+{pricing.whitesExtraLoad} load)</span>
                       <span>GHS {(pricing.whitesExtraLoad * pricing.pricePerLoad).toFixed(2)}</span>
                     </div>
                   )}
                   {extraWashLoads > 0 && (
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>+{extraWashLoads} extra wash × GHS {getExtraWashPrice().toFixed(2)}</span>
+                      <span>+{extraWashLoads} extra wash Ã— GHS {getExtraWashPrice().toFixed(2)}</span>
                       <span>GHS {pricing.extraWashCost.toFixed(2)}</span>
                     </div>
                   )}
                   {extraDryLoads > 0 && (
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>+{extraDryLoads} extra dry × GHS {getExtraDryPrice().toFixed(2)}</span>
+                      <span>+{extraDryLoads} extra dry Ã— GHS {getExtraDryPrice().toFixed(2)}</span>
                       <span>GHS {pricing.extraDryCost.toFixed(2)}</span>
                     </div>
                   )}
@@ -636,7 +658,7 @@ export function OnlineOrdersContent() {
                 </div>
                 {selectedOrder.finalPrice < selectedOrder.totalPrice && (
                   <div className="flex justify-between text-xs text-purple-600 font-medium">
-                    <span>🎁 Loyalty/Discount Applied</span>
+                    <span>ðŸŽ Loyalty/Discount Applied</span>
                     <span>-GHS {(selectedOrder.totalPrice - selectedOrder.finalPrice).toFixed(2)}</span>
                   </div>
                 )}
