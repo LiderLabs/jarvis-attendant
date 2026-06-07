@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -14,7 +14,7 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
   useEffect(() => {
     const token = localStorage.getItem('driver_token')
     if (!token) {
-      router.push('/driver/login')
+      router.push('/driver-login')
       return
     }
     setDriverToken(token)
@@ -33,14 +33,14 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
       localStorage.removeItem('driver_id')
       localStorage.removeItem('driver_name')
       localStorage.removeItem('driver_branch_id')
-      router.push('/driver/login')
+      router.push('/driver-login')
     }
   }, [session, router])
 
-  if (!checked || !driverToken || session === undefined) {
+  if (!checked || !driverToken || (driverToken && session === null)) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center">
-        <div className="text-center text-white">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center text-foreground">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3" />
           <p>Verifying session...</p>
         </div>
@@ -48,10 +48,10 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
     )
   }
 
-  if (!session.valid) {
+  if (session && !session.valid) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-500 to-orange-700 flex items-center justify-center">
-        <div className="text-center text-white">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center text-foreground">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3" />
           <p>Session expired. Redirecting...</p>
         </div>
@@ -61,3 +61,6 @@ export default function DriverLayout({ children }: { children: React.ReactNode }
 
   return <>{children}</>
 }
+
+
+

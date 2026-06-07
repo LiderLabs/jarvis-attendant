@@ -1,15 +1,17 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '@jordan6699/washlab-backend/api'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Truck, Package, CheckCircle2, MapPin, Phone,
   LogOut, ChevronDown, ChevronUp, Loader2,
   Navigation, Clock, User, Home, AlertCircle,
+  Settings, Lock, Eye, EyeOff, ArrowLeft,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
@@ -24,12 +26,7 @@ function getServiceLabel(code: string) {
 }
 
 function OrderCard({
-  order,
-  queue,
-  onPickUp,
-  onDeliver,
-  pickingUp,
-  delivering,
+  order, queue, onPickUp, onDeliver, pickingUp, delivering,
 }: {
   order: any
   queue: 'ready' | 'pickedUp' | 'delivered'
@@ -51,43 +48,26 @@ function OrderCard({
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(deliveryLabel)}`
     : null
 
-  const borderColor =
-    queue === 'delivered' ? 'border-green-200' :
-    queue === 'pickedUp' ? 'border-orange-300' :
-    'border-blue-300'
-
-  const headerBg =
-    queue === 'delivered' ? 'bg-green-50 dark:bg-green-950/20' :
-    queue === 'pickedUp' ? 'bg-orange-50 dark:bg-orange-950/20' :
-    'bg-blue-50 dark:bg-blue-950/20'
+  const cfg = queue === 'delivered'
+    ? { border: 'border-green-200 dark:border-green-800', headerBg: 'bg-green-50 dark:bg-green-950/30', badge: 'bg-green-100 text-green-700 border-green-200', label: 'Delivered' }
+    : queue === 'pickedUp'
+    ? { border: 'border-primary/40', headerBg: 'bg-primary/5', badge: 'bg-primary/10 text-primary border-primary/30', label: 'In Transit' }
+    : { border: 'border-border', headerBg: 'bg-muted/30', badge: 'bg-muted text-muted-foreground border-border', label: 'Ready for Pickup' }
 
   return (
-    <div className={`border-2 ${borderColor} rounded-xl overflow-hidden bg-card shadow-sm`}>
-      {/* Header row */}
+    <div className={`border ${cfg.border} rounded-2xl overflow-hidden bg-card shadow-sm`}>
       <button
         onClick={() => setExpanded(v => !v)}
-        className={`w-full flex items-center gap-3 px-4 py-3 ${headerBg} text-left`}
+        className={`w-full flex items-center gap-3 px-4 py-3.5 ${cfg.headerBg} text-left`}
       >
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-sm">#{order.orderNumber}</span>
-            {queue === 'delivered' && (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200">
-                Delivered
-              </span>
-            )}
-            {queue === 'pickedUp' && (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 border border-orange-200">
-                In Transit
-              </span>
-            )}
-            {queue === 'ready' && (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
-                Ready for Pickup
-              </span>
-            )}
+          <div className="flex items-center gap-2 flex-wrap mb-0.5">
+            <span className="font-bold text-sm font-mono">#{order.orderNumber}</span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${cfg.badge}`}>
+              {cfg.label}
+            </span>
           </div>
-          <p className="text-xs text-muted-foreground truncate mt-0.5">
+          <p className="text-xs text-muted-foreground truncate">
             {order.customerName || order.customerPhoneNumber} · {getServiceLabel(order.serviceType)}
           </p>
         </div>
@@ -97,129 +77,202 @@ function OrderCard({
         </div>
       </button>
 
-      {/* Expanded body */}
       {expanded && (
-        <div className="px-4 py-4 space-y-3 border-t border-border bg-background">
-
-          {/* Customer info */}
-          <div className="flex items-start gap-3 text-sm">
-            <User className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-            <div>
-              <p className="font-medium">{order.customerName || '—'}</p>
-              <p className="text-muted-foreground">{order.customerPhoneNumber}</p>
+        <div className="px-4 py-4 space-y-3 border-t border-border">
+          {/* Customer */}
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+              <User className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-sm">{order.customerName || '—'}</p>
+              <p className="text-xs text-muted-foreground">{order.customerPhoneNumber}</p>
             </div>
             {order.customerPhoneNumber && (
-              <a
-                href={`tel:${order.customerPhoneNumber}`}
-                className="ml-auto flex-shrink-0 p-2 rounded-lg bg-green-50 border border-green-200 text-green-700 hover:bg-green-100"
-              >
+              <a href={`tel:${order.customerPhoneNumber}`}
+                className="w-9 h-9 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 flex items-center justify-center text-green-700 hover:bg-green-100 flex-shrink-0">
                 <Phone className="w-4 h-4" />
               </a>
             )}
           </div>
 
-          {/* Delivery address */}
-          <div className="flex items-start gap-3 text-sm">
+          {/* Address */}
+          <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/40 border border-border">
             <Home className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="font-medium">Delivery Address</p>
-              <p className="text-muted-foreground">{deliveryLabel || 'No address provided'}</p>
+              <p className="text-xs text-muted-foreground mb-0.5">Delivery Address</p>
+              <p className="font-medium text-sm">{deliveryLabel || 'No address provided'}</p>
             </div>
             {mapsUrl && (
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 text-xs font-semibold"
-              >
-                <Navigation className="w-3.5 h-3.5" />
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
+                className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 text-xs font-semibold">
+                <Navigation className="w-3 h-3" />
                 Maps
               </a>
             )}
           </div>
 
-          {/* Payment status */}
-          <div className="flex items-center justify-between text-sm p-3 rounded-lg bg-muted/40 border border-border">
+          {/* Payment */}
+          <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40 border border-border text-sm">
             <span className="text-muted-foreground">Payment</span>
             <div className="flex items-center gap-2">
-              <span className={`font-semibold ${order.paymentStatus === 'paid' ? 'text-green-600' : 'text-orange-600'}`}>
-                {order.paymentStatus === 'paid' ? '✓ Paid' : '⚠ Collect on delivery'}
+              <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${
+                order.paymentStatus === 'paid'
+                  ? 'bg-green-50 text-green-700 border-green-200'
+                  : 'bg-amber-50 text-amber-700 border-amber-200'
+              }`}>
+                {order.paymentStatus === 'paid' ? '✓ Paid' : 'Collect on delivery'}
               </span>
               <span className="font-bold">₵{(order.finalPrice ?? 0).toFixed(2)}</span>
             </div>
           </div>
 
-          {/* Notes */}
           {order.notes && (
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200 text-sm">
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 text-sm">
               <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-              <p className="text-amber-800">{order.notes}</p>
+              <p className="text-amber-800 dark:text-amber-300 text-xs">{order.notes}</p>
             </div>
           )}
 
-          {/* Time */}
-          <p className="text-xs text-muted-foreground">
-            <Clock className="w-3 h-3 inline mr-1" />
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <Clock className="w-3 h-3" />
             {format(new Date(order.createdAt), 'd MMM yyyy, h:mm a')}
           </p>
 
-          {/* Actions */}
           {queue === 'ready' && onPickUp && (
-            <Button
-              onClick={() => onPickUp(order._id)}
-              disabled={pickingUp}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white gap-2"
-            >
+            <Button onClick={() => onPickUp(order._id)} disabled={pickingUp}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2 h-11 rounded-xl font-semibold">
               {pickingUp ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
               Pick Up Order
             </Button>
           )}
 
           {queue === 'pickedUp' && onDeliver && (
-            <>
-              {!showCashConfirm ? (
-                <Button
-                  onClick={() => {
-                    if (order.paymentStatus !== 'paid') {
-                      setShowCashConfirm(true)
-                    } else {
-                      onDeliver(order._id, false)
-                    }
-                  }}
-                  disabled={delivering}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white gap-2"
-                >
-                  {delivering ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                  Mark as Delivered
-                </Button>
-              ) : (
-                <div className="space-y-2 p-3 rounded-lg bg-orange-50 border border-orange-200">
-                  <p className="text-sm font-semibold text-orange-800">Did you collect ₵{(order.finalPrice ?? 0).toFixed(2)} cash?</p>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => { onDeliver(order._id, true); setShowCashConfirm(false) }}
-                      disabled={delivering}
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      Yes, collected
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => { onDeliver(order._id, false); setShowCashConfirm(false) }}
-                      disabled={delivering}
-                      className="flex-1"
-                    >
-                      No / Already paid
-                    </Button>
-                  </div>
+            !showCashConfirm ? (
+              <Button
+                onClick={() => order.paymentStatus !== 'paid' ? setShowCashConfirm(true) : onDeliver(order._id, false)}
+                disabled={delivering}
+                className="w-full bg-green-600 hover:bg-green-700 text-white gap-2 h-11 rounded-xl font-semibold">
+                {delivering ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                Mark as Delivered
+              </Button>
+            ) : (
+              <div className="space-y-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                  Did you collect ₵{(order.finalPrice ?? 0).toFixed(2)} cash?
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => { onDeliver(order._id, true); setShowCashConfirm(false) }}
+                    disabled={delivering} className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+                    Yes, collected
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => { onDeliver(order._id, false); setShowCashConfirm(false) }}
+                    disabled={delivering} className="flex-1 rounded-lg">
+                    No / Already paid
+                  </Button>
                 </div>
-              )}
-            </>
+              </div>
+            )
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+function ProfileTab({ driverToken, driverName, branchName, onBack }: {
+  driverToken: string; driverName: string; branchName: string; onBack: () => void
+}) {
+  const [currentPin, setCurrentPin] = useState('')
+  const [newPin, setNewPin] = useState('')
+  const [confirmPin, setConfirmPin] = useState('')
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showNew, setShowNew] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const changePin = useMutation((api as any).drivers.changeDriverPin)
+
+  const handleChangePin = async () => {
+    if (!currentPin || currentPin.length < 4) { toast.error('Enter your current PIN'); return }
+    if (!newPin || newPin.length < 4) { toast.error('New PIN must be at least 4 digits'); return }
+    if (newPin !== confirmPin) { toast.error('New PINs do not match'); return }
+    setSaving(true)
+    try {
+      await changePin({ driverToken, currentPin, newPin })
+      toast.success('PIN changed successfully!')
+      setCurrentPin(''); setNewPin(''); setConfirmPin('')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to change PIN')
+    } finally { setSaving(false) }
+  }
+
+  return (
+    <div className="space-y-4">
+      <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground font-medium">
+        <ArrowLeft className="w-4 h-4" /> Back to Orders
+      </button>
+
+      <div className="p-5 rounded-2xl bg-card border border-border">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <User className="w-7 h-7 text-primary" />
+          </div>
+          <div>
+            <p className="font-bold text-lg">{driverName}</p>
+            <p className="text-sm text-muted-foreground">{branchName || 'Driver'}</p>
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground p-3 rounded-xl bg-muted/40 border border-border">
+          Contact your branch manager to update your name or phone number.
+        </p>
+      </div>
+
+      <div className="p-5 rounded-2xl bg-card border border-border space-y-4">
+        <div className="flex items-center gap-2">
+          <Lock className="w-4 h-4 text-primary" />
+          <h3 className="font-semibold">Change PIN</h3>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Current PIN</Label>
+          <div className="relative">
+            <Input type={showCurrent ? 'text' : 'password'} inputMode="numeric"
+              value={currentPin} onChange={e => setCurrentPin(e.target.value.replace(/\D/g, '').slice(0, 8))}
+              placeholder="Enter current PIN" className="pr-10 rounded-xl h-11" />
+            <button onClick={() => setShowCurrent(v => !v)} type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">New PIN</Label>
+          <div className="relative">
+            <Input type={showNew ? 'text' : 'password'} inputMode="numeric"
+              value={newPin} onChange={e => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 8))}
+              placeholder="Min 4 digits" className="pr-10 rounded-xl h-11" />
+            <button onClick={() => setShowNew(v => !v)} type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Confirm New PIN</Label>
+          <Input type="password" inputMode="numeric"
+            value={confirmPin} onChange={e => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 8))}
+            placeholder="Repeat new PIN" className="rounded-xl h-11" />
+          {newPin && confirmPin && newPin !== confirmPin && (
+            <p className="text-xs text-destructive">PINs do not match</p>
+          )}
+        </div>
+
+        <Button onClick={handleChangePin} disabled={saving || !currentPin || !newPin || !confirmPin || newPin !== confirmPin}
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-11 font-semibold">
+          {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving...</> : 'Change PIN'}
+        </Button>
+      </div>
     </div>
   )
 }
@@ -230,18 +283,23 @@ export default function DriverDashboard() {
   const [driverName, setDriverName] = useState('')
   const [pickingUpId, setPickingUpId] = useState<string | null>(null)
   const [deliveringId, setDeliveringId] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'ready' | 'pickedUp' | 'delivered'>('ready')
+  const [activeTab, setActiveTab] = useState<'ready' | 'pickedUp' | 'delivered' | 'profile'>('ready')
 
   useEffect(() => {
     const token = localStorage.getItem('driver_token')
     const name = localStorage.getItem('driver_name') || 'Driver'
-    if (!token) { router.push('/driver/login'); return }
+    if (!token) { router.push('/driver-login'); return }
     setDriverToken(token)
     setDriverName(name)
   }, [router])
 
   const orders = useQuery(
     (api as any).drivers.getDeliveryOrders,
+    driverToken ? { driverToken } : 'skip'
+  )
+
+  const session = useQuery(
+    (api as any).drivers.verifyDriverSession,
     driverToken ? { driverToken } : 'skip'
   )
 
@@ -258,9 +316,7 @@ export default function DriverDashboard() {
       setActiveTab('pickedUp')
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed to update')
-    } finally {
-      setPickingUpId(null)
-    }
+    } finally { setPickingUpId(null) }
   }
 
   const handleDeliver = async (orderId: string, collectCash: boolean) => {
@@ -272,30 +328,27 @@ export default function DriverDashboard() {
       setActiveTab('delivered')
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed to update')
-    } finally {
-      setDeliveringId(null)
-    }
+    } finally { setDeliveringId(null) }
   }
 
   const handleLogout = async () => {
-    if (driverToken) {
-      try { await logoutDriver({ driverToken }) } catch {}
-    }
+    if (driverToken) { try { await logoutDriver({ driverToken }) } catch {} }
     localStorage.removeItem('driver_token')
     localStorage.removeItem('driver_id')
     localStorage.removeItem('driver_name')
     localStorage.removeItem('driver_branch_id')
-    router.push('/driver/login')
+    router.push('/driver-login')
   }
 
   const readyOrders = orders?.readyForPickup ?? []
   const pickedUpOrders = orders?.pickedUp ?? []
   const deliveredOrders = orders?.delivered ?? []
+  const branchName = (session as any)?.branchName ?? ''
 
-  const tabs = [
-    { key: 'ready' as const, label: 'Ready', count: readyOrders.length, color: 'blue' },
-    { key: 'pickedUp' as const, label: 'In Transit', count: pickedUpOrders.length, color: 'orange' },
-    { key: 'delivered' as const, label: 'Delivered', count: deliveredOrders.length, color: 'green' },
+  const orderTabs = [
+    { key: 'ready' as const, label: 'Ready', count: readyOrders.length },
+    { key: 'pickedUp' as const, label: 'In Transit', count: pickedUpOrders.length },
+    { key: 'delivered' as const, label: 'Delivered', count: deliveredOrders.length },
   ]
 
   const currentOrders =
@@ -306,91 +359,107 @@ export default function DriverDashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-orange-600 text-white px-4 py-4 sticky top-0 z-40 shadow-md">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+      <header className="bg-primary text-primary-foreground sticky top-0 z-40 shadow-sm">
+        <div className="px-4 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-primary-foreground/20 flex items-center justify-center flex-shrink-0">
               <Truck className="w-5 h-5" />
             </div>
-            <div>
-              <p className="font-bold text-base leading-tight">{driverName}</p>
-              <p className="text-orange-100 text-xs">Driver Portal</p>
+            <div className="min-w-0">
+              <p className="font-bold text-sm leading-tight truncate">{driverName}</p>
+              <p className="text-primary-foreground/60 text-xs truncate">{branchName || 'Driver Portal'}</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleLogout}
-            className="text-white hover:bg-white/20 gap-1.5"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Logout</span>
-          </Button>
-        </div>
-      </div>
-
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
-
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-3">
-          {tabs.map(tab => (
-            <Card key={tab.key} className={`p-4 cursor-pointer transition-all ${activeTab === tab.key ? 'ring-2 ring-orange-500' : ''}`} onClick={() => setActiveTab(tab.key)}>
-              <p className="text-2xl font-bold">{tab.count}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{tab.label}</p>
-            </Card>
-          ))}
-        </div>
-
-        {/* Tab bar */}
-        <div className="flex rounded-xl border border-border overflow-hidden">
-          {tabs.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${
-                activeTab === tab.key
-                  ? 'bg-orange-600 text-white'
-                  : 'bg-card text-muted-foreground hover:bg-muted/50'
-              }`}
-            >
-              {tab.label}
-              {tab.count > 0 && (
-                <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs ${
-                  activeTab === tab.key ? 'bg-white/20' : 'bg-muted'
-                }`}>
-                  {tab.count}
-                </span>
-              )}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button onClick={() => setActiveTab('profile')}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
+                activeTab === 'profile' ? 'bg-primary-foreground/30' : 'hover:bg-primary-foreground/20'
+              }`}>
+              <Settings className="w-4 h-4" />
             </button>
-          ))}
+            <button onClick={handleLogout}
+              className="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-primary-foreground/20 transition-colors">
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
+      </header>
 
-        {/* Orders list */}
-        {orders === undefined ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : currentOrders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-            <Package className="w-12 h-12 mb-3 opacity-30" />
-            <p className="text-sm">No {activeTab === 'ready' ? 'orders ready for pickup' : activeTab === 'pickedUp' ? 'orders in transit' : 'delivered orders today'}</p>
-          </div>
+      <main className="px-4 py-5 space-y-4">
+        {activeTab === 'profile' ? (
+          <ProfileTab
+            driverToken={driverToken!}
+            driverName={driverName}
+            branchName={branchName}
+            onBack={() => setActiveTab('ready')}
+          />
         ) : (
-          <div className="space-y-3">
-            {currentOrders.map((order: any) => (
-              <OrderCard
-                key={order._id}
-                order={order}
-                queue={activeTab}
-                onPickUp={activeTab === 'ready' ? handlePickUp : undefined}
-                onDeliver={activeTab === 'pickedUp' ? handleDeliver : undefined}
-                pickingUp={pickingUpId === order._id}
-                delivering={deliveringId === order._id}
-              />
-            ))}
-          </div>
+          <>
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-3">
+              {orderTabs.map(tab => (
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                  className={`p-4 rounded-2xl border text-left transition-all ${
+                    activeTab === tab.key
+                      ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                      : 'bg-card border-border hover:border-primary/30'
+                  }`}>
+                  <p className="text-2xl font-bold leading-none mb-1">{tab.count}</p>
+                  <p className={`text-xs ${activeTab === tab.key ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                    {tab.label}
+                  </p>
+                </button>
+              ))}
+            </div>
+
+            {/* Tab bar */}
+            <div className="flex rounded-2xl border border-border overflow-hidden bg-card">
+              {orderTabs.map(tab => (
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                  className={`flex-1 py-2.5 text-sm font-semibold transition-colors relative ${
+                    activeTab === tab.key
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-muted/50'
+                  }`}>
+                  {tab.label}
+                  {tab.count > 0 && (
+                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-xs font-bold ${
+                      activeTab === tab.key ? 'bg-primary-foreground/20' : 'bg-muted text-muted-foreground'
+                    }`}>{tab.count}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Orders */}
+            {orders === undefined ? (
+              <div className="flex justify-center py-16">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : currentOrders.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                <Package className="w-12 h-12 mb-3 opacity-30" />
+                <p className="text-sm font-medium">
+                  {activeTab === 'ready' ? 'No orders ready for pickup' :
+                   activeTab === 'pickedUp' ? 'No orders in transit' :
+                   'No delivered orders today'}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3 pb-8">
+                {currentOrders.map((order: any) => (
+                  <OrderCard key={order._id} order={order} queue={activeTab as any}
+                    onPickUp={activeTab === 'ready' ? handlePickUp : undefined}
+                    onDeliver={activeTab === 'pickedUp' ? handleDeliver : undefined}
+                    pickingUp={pickingUpId === order._id}
+                    delivering={deliveringId === order._id}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
-      </div>
+      </main>
     </div>
   )
 }
