@@ -114,7 +114,7 @@ export function OrderRowExpander({ order, stationToken: tokenProp, unpaid, onCol
       ? "233" + order.customer.phoneNumber.slice(1)
       : order.customer.phoneNumber
     const msg = encodeURIComponent(
-      "Hi " + order.customer.name + ", your Javis order *#" + order.orderNumber + "* is ready for pickup! Please bring your bag card. Thank you!"
+      "Hi " + order.customer.name + ", your Rapid Wash order *#" + order.orderNumber + "* is ready for pickup! Please bring your bag card. Thank you!"
     )
     window.open("https://wa.me/" + p + "?text=" + msg, "_blank")
   }

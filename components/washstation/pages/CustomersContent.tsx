@@ -67,7 +67,7 @@ export function CustomersContent() {
   };
 
   const handleNewOrder = (customerId: string) => {
-    sessionStorage.setItem('washlab_prefilledCustomer', JSON.stringify({
+    sessionStorage.setItem('rapidwash_prefilledCustomer', JSON.stringify({
       id: selectedCustomer.id || selectedCustomer._id,
       name: selectedCustomer.name,
       phone: selectedCustomer.phone || selectedCustomer.phoneNumber,

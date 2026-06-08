@@ -152,7 +152,7 @@ export default function EnrollmentPage() {
                 Complete Your Enrollment
               </CardTitle>
               <CardDescription className="text-base">
-                Set up your biometric authentication to access the WashLab workstation
+                Set up your biometric authentication to access the Rapid Wash workstation
               </CardDescription>
             </div>
             

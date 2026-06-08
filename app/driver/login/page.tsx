@@ -123,7 +123,7 @@ export default function DriverLoginPage() {
         </Card>
 
         <p className="text-center text-muted-foreground text-sm mt-6">
-          © {new Date().getFullYear()} WashLab · Powered by Lider Technologies LTD
+          © {new Date().getFullYear()} Rapid Wash · Powered by Lider Technologies LTD
         </p>
       </div>
     </div>

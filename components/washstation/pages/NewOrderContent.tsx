@@ -41,7 +41,7 @@ function isPhoneComplete(phone: string): boolean {
 }
 
 /**
- * Canonical washlab placeholder email.
+ * Canonical rapidwash placeholder email.
  * phone is always the local 10-digit format: "0XXXXXXXXX"
  * Result: "0XXXXXXXXX@washlab.app"  e.g. "0256971012@washlab.app"
  *
@@ -210,7 +210,7 @@ export function NewOrderContent() {
   const hasNavigatedFromPhoneRef = useRef(false)
 
   useEffect(() => {
-    const prefilledData = sessionStorage.getItem('washlab_prefilledCustomer')
+    const prefilledData = sessionStorage.getItem('rapidwash_prefilledCustomer')
     if (prefilledData) {
       try {
         const customerData = JSON.parse(prefilledData)
@@ -225,14 +225,14 @@ export function NewOrderContent() {
           if (typeof rawPhone === 'string') setPhone(normaliseToLocalDigits(rawPhone))
           setStepHistory(["phone"])
           setStep('order')
-          sessionStorage.removeItem('washlab_prefilledCustomer')
+          sessionStorage.removeItem('rapidwash_prefilledCustomer')
           toast.success(`Customer ${customerData.name} loaded`)
         }
       } catch (error) {
         console.error('Error parsing prefilled customer data:', error)
       }
     } else {
-      const activeCustomer = sessionStorage.getItem('washlab_activeCustomer')
+      const activeCustomer = sessionStorage.getItem('rapidwash_activeCustomer')
       if (activeCustomer) {
         try {
           const customerData = JSON.parse(activeCustomer)
@@ -348,7 +348,7 @@ export function NewOrderContent() {
       extraDryLoads,
       savedAt: new Date().toISOString(),
     }
-    sessionStorage.setItem("washlab_order_draft", JSON.stringify(draft))
+    sessionStorage.setItem("rapidwash_order_draft", JSON.stringify(draft))
     toast.success("Draft saved! You can resume it from the dashboard.")
     router.push("/washstation/dashboard")
   }

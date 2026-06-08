@@ -120,7 +120,7 @@ export default function OrderDetailsPage() {
   const nextStage           = effectiveStageIndex < WASH_STAGES.length - 1 ? WASH_STAGES[effectiveStageIndex + 1] : null;
   const showWhatsApp        = currentStatus === 'ready' || currentStatus === 'completed';
 
-  const getTimerKey    = (id: string) => `washlab_timer_${id}`;
+  const getTimerKey    = (id: string) => `rapidwash_timer_${id}`;
   const loadTimerState = (id: string): TimerState | null => {
     try {
       if (typeof window === 'undefined') return null;
@@ -289,7 +289,7 @@ export default function OrderDetailsPage() {
       ? `Original: ₵${order.basePrice.toFixed(2)}\nDiscount: -₵${(order.basePrice - order.finalPrice).toFixed(2)}\n`
       : '';
     const message = encodeURIComponent(
-      `🧺 WashLab Update\n\nHi ${order.customer.name},\nYour laundry order *#${order.orderNumber}* is ready for pickup.\n\nService: ${order.serviceType?.replace(/_/g, ' ')}\nWash Cycles: *${loads} load${loads !== 1 ? 's' : ''}*\n` +
+      `🧺 Rapid Wash Update\n\nHi ${order.customer.name},\nYour laundry order *#${order.orderNumber}* is ready for pickup.\n\nService: ${order.serviceType?.replace(/_/g, ' ')}\nWash Cycles: *${loads} load${loads !== 1 ? 's' : ''}*\n` +
       whitesLine +
       `Total: ₵${order.finalPrice.toFixed(2)}\n` +
       basePriceLine +

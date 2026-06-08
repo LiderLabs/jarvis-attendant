@@ -50,12 +50,12 @@ const ProfileMenu = ({ isOpen, onClose, staff, branchName }: ProfileMenuProps) =
     setIsOnBreak(!isOnBreak);
     // Update session storage with break status
     if (typeof window !== 'undefined') {
-      const staffData = sessionStorage.getItem('washlab_active_staff');
+      const staffData = sessionStorage.getItem('rapidwash_active_staff');
       if (staffData) {
         const parsed = JSON.parse(staffData);
         const staffList = Array.isArray(parsed) ? parsed : [parsed];
         staffList[0].onBreak = !isOnBreak;
-        sessionStorage.setItem('washlab_active_staff', JSON.stringify(staffList));
+        sessionStorage.setItem('rapidwash_active_staff', JSON.stringify(staffList));
       }
     }
   };

@@ -360,7 +360,7 @@ export default function DriverDashboard() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-primary text-primary-foreground sticky top-0 z-40 shadow-sm">
-        <div className="px-4 py-3 flex items-center justify-between gap-3">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-primary-foreground/20 flex items-center justify-center flex-shrink-0">
               <Truck className="w-5 h-5" />
@@ -385,7 +385,7 @@ export default function DriverDashboard() {
         </div>
       </header>
 
-      <main className="px-4 py-5 space-y-4">
+      <main className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         {activeTab === 'profile' ? (
           <ProfileTab
             driverToken={driverToken!}
@@ -396,7 +396,7 @@ export default function DriverDashboard() {
         ) : (
           <>
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
               {orderTabs.map(tab => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                   className={`p-4 rounded-2xl border text-left transition-all ${
@@ -463,3 +463,5 @@ export default function DriverDashboard() {
     </div>
   )
 }
+
+

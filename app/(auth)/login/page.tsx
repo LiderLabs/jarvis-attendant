@@ -231,7 +231,7 @@ export default function LoginPage() {
           </CardContent>
         </Card>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm">
-          Â© {new Date().getFullYear()} WashLab Â· Powered by Lider Technologies LTD
+          Â© {new Date().getFullYear()} Rapid Wash Â· Powered by Lider Technologies LTD
         </div>
       </div>
     );

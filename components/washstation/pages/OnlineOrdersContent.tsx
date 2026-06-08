@@ -192,7 +192,16 @@ export function OnlineOrdersContent() {
     const basePrice = totalLoads * pricePerLoad
     const extraWashCost = extraWashLoads * getExtraWashPrice()
     const extraDryCost = extraDryLoads * getExtraDryPrice()
-    const deliveryFee = selectedOrder.isDelivery && branchInfo ? branchInfo.deliveryFee : 0
+    // Use global delivery pricing based on the selected delivery option
+    const getOptionFee = () => {
+      if (!selectedOrder.isDelivery || !deliveryPricing) return 0;
+      const option = selectedOrder.deliveryOption as string | undefined;
+      if (option === 'dropoff_delivery') return deliveryPricing.dropoff_delivery ?? 0;
+      if (option === 'pickup_self') return deliveryPricing.pickup_self ?? 0;
+      if (option === 'full_service') return deliveryPricing.full_service ?? 0;
+      return deliveryPricing.dropoff_self ?? 0;
+    }
+    const deliveryFee = getOptionFee()
     return { numberOfLoads, whitesExtraLoad, totalLoads, pricePerLoad, basePrice, deliveryFee, extraWashCost, extraDryCost, total: basePrice + extraWashCost + extraDryCost + deliveryFee }
   }
 
@@ -236,6 +245,16 @@ export function OnlineOrdersContent() {
     const minutes = Math.floor(diff / 60000)
     if (minutes < 60) return `${minutes}m ago`
     return `${Math.floor(minutes / 60)}h ago`
+  }
+
+  const getDeliveryOptionLabel = (option?: string) => {
+    const labels: Record<string, string> = {
+      dropoff_self: 'Drop-off + Self Pickup',
+      dropoff_delivery: 'Drop-off + Delivery',
+      pickup_self: 'Pickup + Self Collect',
+      full_service: 'Full Service',
+    }
+    return option ? (labels[option] || option) : 'Standard Delivery'
   }
 
   const getServiceName = (serviceType: string) => {
@@ -315,7 +334,7 @@ export function OnlineOrdersContent() {
                 <span className="text-primary font-medium">#{order.orderNumber}</span>
                 <span>Â·</span>
                 <span className="truncate">{getServiceName(order.serviceType || "wash_and_fold")}</span>
-                {order.isDelivery && <><span>Â·</span><span className="text-amber-500">Delivery</span></>}
+                {order.isDelivery && <><span>·</span><span className="text-amber-500">{getDeliveryOptionLabel((order as any).deliveryOption)}</span></>}
                 {order.finalPrice < order.totalPrice && <><span>Â·</span><span className="text-purple-500">ðŸŽ Loyalty</span></>}
               </div>
             </button>
@@ -376,7 +395,9 @@ export function OnlineOrdersContent() {
               <Truck className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">Delivery Order</p>
+              <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">
+                {getDeliveryOptionLabel((selectedOrder as any).deliveryOption)}
+              </p>
               <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5 flex items-center gap-1">
                 <MapPin className="w-3 h-3 flex-shrink-0" />
                 {selectedOrder.deliveryHall
@@ -422,7 +443,11 @@ export function OnlineOrdersContent() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Order Type</span>
-              <span className="font-medium">{selectedOrder.isDelivery ? "Delivery" : "Pickup"}</span>
+              <span className="font-medium">
+                {selectedOrder.isDelivery
+                  ? getDeliveryOptionLabel((selectedOrder as any).deliveryOption)
+                  : "Self Service"}
+              </span>
             </div>
             {selectedOrder.isDelivery && selectedOrder.deliveryAddress && (
               <div className="flex justify-between">

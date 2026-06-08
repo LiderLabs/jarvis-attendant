@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Attendant Authentication - WashLab",
+  title: "Attendant Authentication - Rapid Wash",
   description: "Attendant enrollment and authentication",
 }
 

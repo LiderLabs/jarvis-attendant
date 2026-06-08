@@ -51,7 +51,7 @@ export function SettingsContent() {
   useEffect(() => {
     if (typeof window === "undefined") return
 
-    const storedStatus = sessionStorage.getItem("washlab_branch_status")
+    const storedStatus = sessionStorage.getItem("rapidwash_branch_status")
     if (storedStatus) {
       setBranchOnline(storedStatus === "online")
     }
@@ -66,7 +66,7 @@ export function SettingsContent() {
     setBranchOnline(newStatus)
     if (typeof window !== "undefined") {
       sessionStorage.setItem(
-        "washlab_branch_status",
+        "rapidwash_branch_status",
         newStatus ? "online" : "offline"
       )
     }

@@ -59,9 +59,9 @@ function OrderCompleteContent() {
     const loads = order?.estimatedLoads ?? 1;
     const deliveryLine = isDeliveryOrder ? `Delivery: *Yes*\n` : '';
     const msg =
-      `🧺 WashLab Receipt\n\n` +
+      `🧺 Rapid Wash Receipt\n\n` +
       `Hi ${name},\n` +
-      `Thank you for using WashLab!\n\n` +
+      `Thank you for using Rapid Wash!\n\n` +
       `Order: *#${num}*\n` +
       `Service: ${serviceDesc}\n` +
       `Wash Cycles: *${loads} load${loads !== 1 ? 's' : ''}*\n` +

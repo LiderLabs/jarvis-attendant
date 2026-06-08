@@ -14,7 +14,7 @@ const useUserSession = () => {
   
   useEffect(() => {
     // Check localStorage for logged-in user (demo purposes)
-    const storedUser = localStorage.getItem('washlab_user');
+    const storedUser = localStorage.getItem('rapidwash_user');
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
@@ -25,7 +25,7 @@ const useUserSession = () => {
     
     // Listen for storage events to sync across tabs
     const handleStorage = () => {
-      const storedUser = localStorage.getItem('washlab_user');
+      const storedUser = localStorage.getItem('rapidwash_user');
       if (storedUser) {
         try {
           setUser(JSON.parse(storedUser));

@@ -52,8 +52,8 @@ export default function ShiftManagementPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
-    const activeStaffData = sessionStorage.getItem('washlab_active_staff');
-    const storedBranch = sessionStorage.getItem('washlab_branch');
+    const activeStaffData = sessionStorage.getItem('rapidwash_active_staff');
+    const storedBranch = sessionStorage.getItem('rapidwash_branch');
     
     if (activeStaffData) {
       try {
@@ -107,10 +107,10 @@ export default function ShiftManagementPage() {
   const handleClockOut = () => {
     if (!staffData || typeof window === 'undefined') return;
 
-    sessionStorage.removeItem('washlab_active_staff');
+    sessionStorage.removeItem('rapidwash_active_staff');
 
     try {
-      const attendanceLog = JSON.parse(localStorage.getItem('washlab_attendance_log') || '[]');
+      const attendanceLog = JSON.parse(localStorage.getItem('rapidwash_attendance_log') || '[]');
       attendanceLog.push({
         staffId: staffData.id,
         staffName: staffData.name,
@@ -122,12 +122,12 @@ export default function ShiftManagementPage() {
         notes: shiftNotes,
         ordersProcessed: shiftStats.ordersProcessed,
       });
-      localStorage.setItem('washlab_attendance_log', JSON.stringify(attendanceLog));
+      localStorage.setItem('rapidwash_attendance_log', JSON.stringify(attendanceLog));
     } catch (error) {
       console.error('Error saving attendance log:', error);
     }
 
-    sessionStorage.removeItem('washlab_branch');
+    sessionStorage.removeItem('rapidwash_branch');
     toast.success(`${staffData.name} clocked out successfully`);
     router.push('/washstation');
   };
@@ -135,7 +135,7 @@ export default function ShiftManagementPage() {
   const handleBreakToggle = () => {
     if (!staffData || typeof window === 'undefined') return;
 
-    const activeStaffData = sessionStorage.getItem('washlab_active_staff');
+    const activeStaffData = sessionStorage.getItem('rapidwash_active_staff');
     if (activeStaffData) {
       try {
         const activeStaff: ActiveStaff[] = JSON.parse(activeStaffData);
@@ -150,7 +150,7 @@ export default function ShiftManagementPage() {
             toast.success('Break started');
           }
           
-          sessionStorage.setItem('washlab_active_staff', JSON.stringify(activeStaff));
+          sessionStorage.setItem('rapidwash_active_staff', JSON.stringify(activeStaff));
           setStaffData(activeStaff[staffIndex]);
           window.dispatchEvent(new Event('storage'));
         }

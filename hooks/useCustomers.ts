@@ -13,7 +13,7 @@ export interface Customer {
   isLoyaltyMember: boolean;
 }
 
-const CUSTOMERS_KEY = 'washlab_customers';
+const CUSTOMERS_KEY = 'rapidwash_customers';
 
 /**
  * Customer Management Hook

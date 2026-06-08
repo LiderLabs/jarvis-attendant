@@ -31,7 +31,7 @@ export default function ConfirmClockInPage() {
     if (typeof window === 'undefined') return;
     
     const pendingStaff = sessionStorage.getItem('washstation_pending_staff');
-    const storedBranch = sessionStorage.getItem('washlab_branch');
+    const storedBranch = sessionStorage.getItem('rapidwash_branch');
     
     if (pendingStaff) {
       try {
@@ -59,7 +59,7 @@ export default function ConfirmClockInPage() {
   const handleConfirm = () => {
     if (!staffData || typeof window === 'undefined') return;
 
-    const existingStaff = sessionStorage.getItem('washlab_active_staff');
+    const existingStaff = sessionStorage.getItem('rapidwash_active_staff');
     const activeStaff = existingStaff ? JSON.parse(existingStaff) : [];
 
     const newStaffEntry = {
@@ -72,17 +72,17 @@ export default function ConfirmClockInPage() {
     };
 
     activeStaff.push(newStaffEntry);
-    sessionStorage.setItem('washlab_active_staff', JSON.stringify(activeStaff));
+    sessionStorage.setItem('rapidwash_active_staff', JSON.stringify(activeStaff));
     
     if (branch) {
-      sessionStorage.setItem('washlab_branch', JSON.stringify(branch));
+      sessionStorage.setItem('rapidwash_branch', JSON.stringify(branch));
     }
     
     sessionStorage.removeItem('washstation_pending_staff');
-    sessionStorage.setItem('washlab_current_staff', JSON.stringify(newStaffEntry));
+    sessionStorage.setItem('rapidwash_current_staff', JSON.stringify(newStaffEntry));
 
     try {
-      const attendanceLog = JSON.parse(localStorage.getItem('washlab_attendance_log') || '[]');
+      const attendanceLog = JSON.parse(localStorage.getItem('rapidwash_attendance_log') || '[]');
       attendanceLog.push({
         staffId: staffData.id,
         staffName: staffData.name,
@@ -92,7 +92,7 @@ export default function ConfirmClockInPage() {
         timestamp: new Date().toISOString(),
         shiftId: newStaffEntry.shiftId,
       });
-      localStorage.setItem('washlab_attendance_log', JSON.stringify(attendanceLog));
+      localStorage.setItem('rapidwash_attendance_log', JSON.stringify(attendanceLog));
     } catch (error) {
       console.error('Error saving attendance log:', error);
     }

@@ -60,7 +60,7 @@ interface OrderContextType {
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'washlab_orders';
+const STORAGE_KEY = 'rapidwash_orders';
 
 export const OrderProvider = ({ children }: { children: ReactNode }) => {
   const [orders, setOrders] = useState<Order[]>(() => {

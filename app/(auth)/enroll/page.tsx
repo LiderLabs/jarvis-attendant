@@ -180,7 +180,7 @@ function EnrollmentQueryPageContent() {
                 Complete Your Enrollment
               </CardTitle>
               <CardDescription className='text-base'>
-                Set up your biometric authentication to access the WashLab
+                Set up your biometric authentication to access the Rapid Wash
                 workstation
               </CardDescription>
             </div>

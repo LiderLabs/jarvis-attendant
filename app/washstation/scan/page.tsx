@@ -21,12 +21,12 @@ export default function FaceScanPage() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const stored = sessionStorage.getItem('washlab_branch') || sessionStorage.getItem('washstation_branch');
+    const stored = sessionStorage.getItem('rapidwash_branch') || sessionStorage.getItem('washstation_branch');
     if (stored) {
       try {
         const branchData = JSON.parse(stored);
         setBranch(branchData);
-        sessionStorage.setItem('washlab_branch', JSON.stringify(branchData));
+        sessionStorage.setItem('rapidwash_branch', JSON.stringify(branchData));
       } catch (error) {
         console.error('Error parsing branch data:', error);
       }

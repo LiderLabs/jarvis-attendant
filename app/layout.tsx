@@ -5,8 +5,8 @@ import { Providers } from "@/providers/providers";
 const inter = { variable: "--font-inter" }
 
 export const metadata: Metadata = {
-  title: "WashLab Attendant ",
-  description: "WashLab Attendant Point of Sale System",
+  title: "Rapid Wash Attendant ",
+  description: "Rapid Wash Attendant Point of Sale System",
 };
 
 export default function RootLayout({

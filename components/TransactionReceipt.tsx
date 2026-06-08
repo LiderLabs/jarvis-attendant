@@ -50,7 +50,7 @@ const TransactionReceipt = ({ isOpen, onClose, order, attendantName }: Transacti
     }
 
     const message = encodeURIComponent(
-      `*Javis Receipt*\n\n` +
+      `*Rapid Wash Receipt*\n\n` +
       `📋 Order: ${order.code}\n` +
       `👤 Customer: ${order.customerName}\n` +
       `📱 Phone: ${order.customerPhone}\n` +
@@ -61,7 +61,7 @@ const TransactionReceipt = ({ isOpen, onClose, order, attendantName }: Transacti
       `⏰ Time: ${new Date().toLocaleTimeString()}\n` +
       `━━━━━━━━━━━━━━━━━━━━━\n` +
       `Processed by: ${attendantName}\n\n` +
-      `Thank you for choosing Javis! 🧺✨\n` +
+      `Thank you for choosing Rapid Wash! 🧺✨\n` +
       `Your laundry will be ready for pickup soon.`
     );
 
@@ -106,7 +106,7 @@ const TransactionReceipt = ({ isOpen, onClose, order, attendantName }: Transacti
         {/* Receipt Details */}
         <div className="bg-muted/50 rounded-xl p-4 mb-6 print:bg-white print:border print:border-gray-200">
           <div className="text-center mb-4 pb-4 border-b border-border">
-            <h3 className="font-bold text-lg text-foreground">Javis</h3>
+            <h3 className="font-bold text-lg text-foreground">Rapid Wash</h3>
             <p className="text-xs text-muted-foreground">Official Receipt</p>
           </div>
 
@@ -152,7 +152,7 @@ const TransactionReceipt = ({ isOpen, onClose, order, attendantName }: Transacti
           </div>
 
           <div className="text-center mt-4 pt-4 border-t border-border">
-            <p className="text-xs text-muted-foreground">Thank you for choosing Javis!</p>
+            <p className="text-xs text-muted-foreground">Thank you for choosing Rapid Wash!</p>
           </div>
         </div>
 

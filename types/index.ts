@@ -115,7 +115,7 @@ export interface Voucher {
   isActive: boolean
 }
 
-// Status stage info - WashLab colors
+// Status stage info - Rapid Wash colors
 export const ORDER_STAGES: {
   status: OrderStatus
   label: string

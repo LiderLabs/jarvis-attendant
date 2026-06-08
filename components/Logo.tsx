@@ -1,53 +1,28 @@
 "use client"
-
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
 
 interface LogoProps {
   className?: string;
+  _showText?: boolean;
   size?: 'sm' | 'md' | 'lg';
 }
 
-export const Logo = ({ className, size = 'md' }: LogoProps) => {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null; // 🔥 prevents hydration issues in prod
-
-  const sizeConfig = {
-    sm: { height: 28, width: 100 },
-    md: { height: 40, width: 160 },
-    lg: { height: 80, width: 280 },
+export const Logo = ({ className, _showText = true, size = 'md' }: LogoProps) => {
+  const sizeClasses = {
+    sm: 'h-[80px]',
+    md: 'h-[100px]',
+    lg: 'h-[200px]',
   };
-
-  const { height, width } = sizeConfig[size];
-
-  const logoSrc =
-    resolvedTheme === 'dark'
-      ? '/assets/javis.png'
-      : '/assets/javis.png';
-
   return (
-    <div className={cn('flex items-center items-center', className)} >
+    <div className={cn('flex items-center', className)}>
       <Image
-        src={logoSrc}
-        alt="Javis - Life made simple"
-        height={height}
-        width={width}
-        className="w-auto" 
-        priority
+        src="/assets/Rapid.png"
+        alt="Rapid Wash"
+        className={cn(sizeClasses[size], 'w-auto')}
+        height={size === 'sm' ? 40 : size === 'md' ? 56 : 80}
+        width={size === 'sm' ? 150 : size === 'md' ? 250 : 280}
       />
     </div>
   );
 };
-
-
-
-
-

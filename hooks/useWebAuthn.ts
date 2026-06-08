@@ -12,7 +12,7 @@ interface WebAuthnCredential {
 }
 
 // Store credentials in localStorage for demo (in production, this goes to backend)
-const CREDENTIALS_KEY = 'washlab_webauthn_credentials';
+const CREDENTIALS_KEY = 'rapidwash_webauthn_credentials';
 
 const getStoredCredentials = (): WebAuthnCredential[] => {
   if (typeof window === 'undefined') return [];
@@ -87,7 +87,7 @@ export const useWebAuthn = () => {
       const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
         challenge,
         rp: {
-          name: 'Javis',
+          name: 'Rapid Wash',
           id: window.location.hostname,
         },
         user: {

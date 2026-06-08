@@ -118,7 +118,7 @@ function DailyReportPageInner() {
   const [reportDateFilter, setReportDateFilter] = useState('');
   const [showDraftBanner, setShowDraftBanner] = useState(false);
   const [draftDate, setDraftDate] = useState<string | null>(null);
-  const DRAFT_KEY = `washlab_report_draft_${branchId || "unknown"}`;
+  const DRAFT_KEY = `rapidwash_report_draft_${branchId || "unknown"}`;
   const isSubmitted = existingDraft?.status === 'submitted' || existingDraft?.status === 'submitted_with_outstanding';
 
   useEffect(() => {

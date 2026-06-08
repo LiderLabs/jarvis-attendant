@@ -333,7 +333,7 @@ function PaymentContent() {
       isPaying.current = false;
     }
 
-    const ref = `washlab_${order._id}_${Date.now()}`;
+    const ref = `rapidwash_${order._id}_${Date.now()}`;
     setPaystackRef(ref);
 
     // ✅ AWAIT this — the ref MUST be saved before the popup opens so that
@@ -360,7 +360,7 @@ function PaymentContent() {
     try {
       handler = (window as any).PaystackPop.setup({
         key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
-        email: order.customer?.email || order.customerEmail || "customer@washlab.com",
+        email: order.customer?.email || order.customerEmail || "customer@rapidwash.com",
         amount: Math.round(paystackChargeAmount * 100),
         currency: "GHS",
         ref,
@@ -507,7 +507,7 @@ function PaymentContent() {
     if (isProcessing) return;
     if (returnTo === "order" && order) {
       if (order.customer || order.customerId) {
-        sessionStorage.setItem("washlab_prefilledCustomer", JSON.stringify({
+        sessionStorage.setItem("rapidwash_prefilledCustomer", JSON.stringify({
           id: order.customer?._id || order.customerId,
           name: order.customer?.name || "Customer",
           phone: order.customer?.phoneNumber || order.customerPhoneNumber || "",

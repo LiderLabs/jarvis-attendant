@@ -26,8 +26,8 @@ export default function BranchEntryPage() {
   // Redirect to dashboard if already logged in
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const activeStaff = sessionStorage.getItem('Javis_active_staff');
-    const branch = sessionStorage.getItem('Javis_branch');
+    const activeStaff = sessionStorage.getItem('Rapid Wash_active_staff');
+    const branch = sessionStorage.getItem('Rapid Wash_branch');
     if (activeStaff && branch) {
       router.push('/washstation/dashboard');
     }
@@ -49,7 +49,7 @@ export default function BranchEntryPage() {
     
     // Store branch in session with consistent key
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('Javis_branch', JSON.stringify(selectedBranch));
+      sessionStorage.setItem('Rapid Wash_branch', JSON.stringify(selectedBranch));
     }
     router.push('/washstation/scan');
   };
@@ -121,7 +121,7 @@ export default function BranchEntryPage() {
       {/* Footer */}
       <footer className="p-6 text-center">
         <p className="text-white/60 text-sm">
-          © 2026 Javis · Powered by Lider Technologies LTD
+          © 2026 Rapid Wash · Powered by Lider Technologies LTD
         </p>
       </footer>
     </div>

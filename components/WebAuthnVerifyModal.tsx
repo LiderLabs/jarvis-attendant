@@ -65,7 +65,7 @@ const WebAuthnVerifyModal = ({
       const timestamp = new Date().toISOString();
       
       // Log the verification
-      const verificationLog = JSON.parse(localStorage.getItem('washlab_verification_log') || '[]');
+      const verificationLog = JSON.parse(localStorage.getItem('rapidwash_verification_log') || '[]');
       verificationLog.push({
         staffId: result.staffId,
         staffName: result.staffName,
@@ -74,7 +74,7 @@ const WebAuthnVerifyModal = ({
         timestamp,
         verified: true
       });
-      localStorage.setItem('washlab_verification_log', JSON.stringify(verificationLog));
+      localStorage.setItem('rapidwash_verification_log', JSON.stringify(verificationLog));
       
       // Auto-close and call success after brief delay
       setTimeout(() => {

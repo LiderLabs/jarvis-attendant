@@ -110,7 +110,7 @@ export function OrderCard({ order, onClick }: OrderCardProps) {
 
     const phone = order.customer.phoneNumber.replace(/\D/g, "")
     const message = encodeURIComponent(
-      `🧺 WashLab Update\n\n` +
+      `🧺 Rapid Wash Update\n\n` +
         `Hi ${order.customer.name},\n` +
         `Your laundry order *#${order.orderNumber}* is ready for pickup.\n\n` +
         `Total: ₵${order.finalPrice.toFixed(2)}\n` +

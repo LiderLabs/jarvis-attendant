@@ -42,7 +42,7 @@ function CustomerCard({ customer, stationToken }: { customer: any, stationToken:
   );
 
   const handleCreateOrder = () => {
-    sessionStorage.setItem('washlab_prefilledCustomer', JSON.stringify({
+    sessionStorage.setItem('rapidwash_prefilledCustomer', JSON.stringify({
       id: customer._id,
       name: customer.name,
       phone: customer.phoneNumber,
