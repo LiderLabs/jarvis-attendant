@@ -42,6 +42,16 @@ export function DeliveryHandoffCard({
     assignedDriverId ? { driverId: assignedDriverId } : 'skip'
   )
 
+  const getDeliveryLabel = (opt?: string) => {
+    const labels: Record<string, string> = {
+      dropoff_delivery: 'Drop-off + Delivery',
+      pickup_self: 'Pickup + Self Collect',
+      full_service: 'Full Service',
+      dropoff_self: 'Self Service',
+    }
+    return opt ? (labels[opt] || 'Delivery') : 'Delivery'
+  }
+
   const isAlreadyReady =
     marked ||
     orderStatus === 'ready' ||
@@ -62,7 +72,7 @@ export function DeliveryHandoffCard({
     try {
       await markReady({ orderId, stationToken })
       setMarked(true)
-      toast.success('Order marked ready — driver will be notified')
+      toast.success('Order handed to driver queue')
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed to mark ready')
     } finally {
@@ -158,7 +168,7 @@ export function DeliveryHandoffCard({
             {marking ? (
               <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Marking Ready...</>
             ) : (
-              <><Truck className="w-4 h-4 mr-2" /> Mark Ready for Delivery</>
+              <><Truck className="w-4 h-4 mr-2" /> Hand to Driver</>
             )}
           </Button>
         )}

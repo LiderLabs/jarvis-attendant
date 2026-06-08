@@ -208,7 +208,13 @@ export function OrdersContent() {
               </span>
               {selectedOrder.isDelivery && (
                 <span className="text-xs px-2 py-0.5 rounded-full border bg-amber-100 text-amber-700 border-amber-200 font-medium flex items-center gap-1">
-                  <Truck className="w-3 h-3" /> Delivery
+                  <Truck className="w-3 h-3" />
+                  {{
+                    dropoff_delivery: 'Drop-off + Delivery',
+                    pickup_self: 'Pickup + Self Collect',
+                    full_service: 'Full Service',
+                    dropoff_self: 'Self Service',
+                  }[(selectedOrder as any).deliveryOption as string] || 'Delivery'}
                 </span>
               )}
             </div>
@@ -322,6 +328,7 @@ export function OrdersContent() {
                 orderStatus={selectedOrder.status}
                 driverStatus={selectedOrder.driverStatus}
                 assignedDriverId={selectedOrder.assignedDriverId}
+                deliveryOption={(selectedOrder as any).deliveryOption}
               />
             )}
           </>
