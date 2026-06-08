@@ -328,7 +328,6 @@ export function OrdersContent() {
                 orderStatus={selectedOrder.status}
                 driverStatus={selectedOrder.driverStatus}
                 assignedDriverId={selectedOrder.assignedDriverId}
-                deliveryOption={(selectedOrder as any).deliveryOption}
               />
             )}
           </>

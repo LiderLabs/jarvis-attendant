@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -20,20 +20,17 @@ import { ActionVerification } from "@/components/washstation/ActionVerification"
 
 const SERVICE_PRICE_PER_LOAD: Record<string, number> = {}
 const KG_PER_LOAD = 8
-const WHITES_EXTRA_LOAD = 0 // Attendant manually adds extra load if needed
+const WHITES_EXTRA_LOAD = 0
 
 export function OnlineOrdersContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { stationToken, isSessionValid } = useStationSession()
 
-  // Two-step mobile flow: "queue" | "detail"
   const [mobileView, setMobileView] = useState<"queue" | "detail">("queue")
-
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [showRejectVerification, setShowRejectVerification] = useState(false)
-
   const [weight, setWeight] = useState<string>("")
   const [laundryBags, setLaundryBags] = useState(1)
   const [bagCardNumber, setBagCardNumber] = useState("")
@@ -70,12 +67,14 @@ export function OnlineOrdersContent() {
     (api as any).admin.getBranchServices,
     (selectedOrder?.branchId || (branchInfo as any)?.branchId) ? { branchId: selectedOrder?.branchId || (branchInfo as any).branchId } : "skip"
   ) ?? []
+
   const activeMachines = useQuery(
     (api as any).branchMachines.getActiveMachines,
     (selectedOrder?.branchId || (branchInfo as any)?.branchId) ? { branchId: selectedOrder?.branchId || (branchInfo as any).branchId } : "skip"
   ) ?? []
 
-  // Restore draft on return from payment
+  const deliveryPricing = useQuery((api as any).admin.getDeliveryPricing)
+
   useEffect(() => {
     const returningOrderId = searchParams?.get("returnOrder")
     if (!returningOrderId || isLoadingOrders) return
@@ -118,8 +117,7 @@ export function OnlineOrdersContent() {
     attendantId: Id<"attendants">,
     verificationId: Id<"biometricVerifications">
   ) => {
-    if (!selectedOrder || !stationToken) { toast.error("Please select an order");
-  const deliveryPricing = useQuery((api as any).admin.getDeliveryPricing) return }
+    if (!selectedOrder || !stationToken) { toast.error("Please select an order"); return }
     try {
       await cancelOrder({
         stationToken,
@@ -163,6 +161,7 @@ export function OnlineOrdersContent() {
     const match = (branchServices as any[]).find(s => s.code === serviceCode)
     return match?.extraWashPrice ?? getPricePerLoad(serviceCode)
   }
+
   const getExtraDryPrice = (): number => {
     const serviceCode = selectedOrder?.serviceType === "wash_and_dry" ? "wash_and_dry" : "dry_only"
     const match = (branchServices as any[]).find(s => s.code === serviceCode)
@@ -176,14 +175,12 @@ export function OnlineOrdersContent() {
       return { numberOfLoads: 0, whitesExtraLoad: 0, totalLoads: 0, pricePerLoad: 0, basePrice: 0, deliveryFee: 0, extraWashCost: 0, extraDryCost: 0, total: selectedOrder?.finalPrice || 0 }
     }
     const serviceType = selectedOrder.serviceType || "wash_and_dry"
-    const selectedMachine = null
     const baseWashPrice = getPricePerLoad("wash_only")
     const dryPrice = getPricePerLoad("dry_only")
-    const effectiveWashPrice = selectedMachine ? selectedMachine.washPrice : baseWashPrice
     const pricePerLoad = serviceType === "wash_and_dry"
-      ? effectiveWashPrice + dryPrice
+      ? baseWashPrice + dryPrice
       : serviceType === "wash_only"
-      ? effectiveWashPrice
+      ? baseWashPrice
       : serviceType === "dry_only"
       ? dryPrice
       : getPricePerLoad(serviceType)
@@ -193,14 +190,14 @@ export function OnlineOrdersContent() {
     const basePrice = totalLoads * pricePerLoad
     const extraWashCost = extraWashLoads * getExtraWashPrice()
     const extraDryCost = extraDryLoads * getExtraDryPrice()
-    // Use global delivery pricing based on the selected delivery option
     const getOptionFee = () => {
-      const dp = (deliveryPricing as any); if (!selectedOrder.isDelivery || !dp) return 0;
-      const option = selectedOrder.deliveryOption as string | undefined;
-      if (option === 'dropoff_delivery') return dp.dropoff_delivery ?? 0;
-      if (option === 'pickup_self') return dp.pickup_self ?? 0;
-      if (option === 'full_service') return dp.full_service ?? 0;
-      return dp.dropoff_self ?? 0;
+      const dp = (deliveryPricing as any)
+      if (!selectedOrder.isDelivery || !dp) return 0
+      const option = selectedOrder.deliveryOption as string | undefined
+      if (option === 'dropoff_delivery') return dp.dropoff_delivery ?? 0
+      if (option === 'pickup_self') return dp.pickup_self ?? 0
+      if (option === 'full_service') return dp.full_service ?? 0
+      return dp.dropoff_self ?? 0
     }
     const deliveryFee = getOptionFee()
     return { numberOfLoads, whitesExtraLoad, totalLoads, pricePerLoad, basePrice, deliveryFee, extraWashCost, extraDryCost, total: basePrice + extraWashCost + extraDryCost + deliveryFee }
@@ -287,7 +284,6 @@ export function OnlineOrdersContent() {
 
   if (!isSessionValid) return <LoadingSpinner text="Verifying session..." />
 
-  // â”€â”€ Queue Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const QueuePanel = (
     <div className={`
       ${mobileView === "queue" ? "flex" : "hidden"}
@@ -305,7 +301,6 @@ export function OnlineOrdersContent() {
           />
         </div>
       </div>
-
       <div className="flex-1 overflow-y-auto divide-y divide-border">
         {isLoadingOrders ? (
           <div className="p-8 text-center text-muted-foreground">
@@ -333,10 +328,10 @@ export function OnlineOrdersContent() {
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="text-primary font-medium">#{order.orderNumber}</span>
-                <span>Â·</span>
+                <span>·</span>
                 <span className="truncate">{getServiceName(order.serviceType || "wash_and_fold")}</span>
                 {order.isDelivery && <><span>·</span><span className="text-amber-500">{getDeliveryOptionLabel((order as any).deliveryOption)}</span></>}
-                {order.finalPrice < order.totalPrice && <><span>Â·</span><span className="text-purple-500">ðŸŽ Loyalty</span></>}
+                {order.finalPrice < order.totalPrice && <><span>·</span><span className="text-purple-500">🎁 Loyalty</span></>}
               </div>
             </button>
           ))
@@ -350,13 +345,11 @@ export function OnlineOrdersContent() {
     </div>
   )
 
-    // â”€â”€ Detail Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const DetailPanel = selectedOrder ? (
     <div className={`
       ${mobileView === "detail" ? "flex" : "hidden"}
       lg:flex flex-1 flex-col overflow-y-auto min-w-0
     `}>
-      {/* Mobile back button */}
       <div className="lg:hidden flex items-center gap-2 p-3 border-b border-border bg-card sticky top-0 z-10">
         <button onClick={handleBack} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-4 h-4" />
@@ -365,8 +358,6 @@ export function OnlineOrdersContent() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 pb-32">
-
-        {/* Customer Header */}
         <div className="flex items-start gap-3">
           <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
             <User className="w-6 h-6 text-muted-foreground" />
@@ -389,7 +380,6 @@ export function OnlineOrdersContent() {
           </div>
         </div>
 
-        {/* Delivery Banner */}
         {selectedOrder.isDelivery && (
           <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
             <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-800 flex items-center justify-center flex-shrink-0">
@@ -412,13 +402,11 @@ export function OnlineOrdersContent() {
           </div>
         )}
 
-
         <div>
           <p className="text-xs text-muted-foreground">Order ID</p>
           <p className="font-bold text-foreground">#{selectedOrder.orderNumber}</p>
         </div>
 
-        {/* Customer Order Details */}
         <div className="bg-card border border-border rounded-xl p-4">
           <h3 className="font-semibold text-sm text-foreground mb-3">Customer Order Details</h3>
           <div className="space-y-2 text-sm">
@@ -430,12 +418,10 @@ export function OnlineOrdersContent() {
               <span className="text-muted-foreground">Est. Weight</span>
               <span className="font-medium">{selectedOrder.estimatedWeight?.toFixed(1) || "0.0"} kg</span>
             </div>
-            {true && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Item Count</span>
-                <span className="font-medium">{selectedOrder.itemCount} item{selectedOrder.itemCount !== 1 ? "s" : ""}</span>
-              </div>
-            )}
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Item Count</span>
+              <span className="font-medium">{selectedOrder.itemCount} item{selectedOrder.itemCount !== 1 ? "s" : ""}</span>
+            </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Whites Separate</span>
               <span className={selectedOrder.whitesSeparate ? "font-medium text-yellow-600" : "text-muted-foreground"}>
@@ -471,15 +457,14 @@ export function OnlineOrdersContent() {
 
         {selectedOrder.finalPrice < selectedOrder.totalPrice && (
           <div className="flex items-center gap-2 p-3 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
-            <span className="text-lg">ðŸŽ</span>
+            <span className="text-lg">🎁</span>
             <div>
               <p className="text-sm font-semibold text-purple-700 dark:text-purple-400">Loyalty Reward Applied</p>
-              <p className="text-xs text-muted-foreground">Customer saved GHS {(selectedOrder.totalPrice - selectedOrder.finalPrice).toFixed(2)} â€” Total due: GHS {selectedOrder.finalPrice.toFixed(2)}</p>
+              <p className="text-xs text-muted-foreground">Customer saved GHS {(selectedOrder.totalPrice - selectedOrder.finalPrice).toFixed(2)} — Total due: GHS {selectedOrder.finalPrice.toFixed(2)}</p>
             </div>
           </div>
         )}
 
-        {/* Weight Intake */}
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-foreground flex items-center gap-2">
@@ -511,7 +496,6 @@ export function OnlineOrdersContent() {
           </div>
         </div>
 
-        {/* Customer Instructions */}
         <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
           <h3 className="font-semibold text-foreground flex items-center gap-2 mb-2 text-sm">
             <MessageSquare className="w-4 h-4 text-amber-500" />
@@ -522,7 +506,6 @@ export function OnlineOrdersContent() {
           </p>
         </div>
 
-        {/* Extra Loads */}
         <div className="bg-card border border-border rounded-xl p-4">
           <h3 className="font-semibold text-sm text-foreground mb-3">Extra Loads</h3>
           <div className="space-y-3">
@@ -530,7 +513,7 @@ export function OnlineOrdersContent() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Extra Wash</span>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setExtraWashLoads(Math.max(0, extraWashLoads - 1))} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-sm font-bold hover:bg-muted/80">âˆ’</button>
+                  <button onClick={() => setExtraWashLoads(Math.max(0, extraWashLoads - 1))} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-sm font-bold hover:bg-muted/80">−</button>
                   <span className="text-sm font-bold w-5 text-center">{extraWashLoads}</span>
                   <button onClick={() => setExtraWashLoads(extraWashLoads + 1)} className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold hover:bg-primary/90">+</button>
                 </div>
@@ -540,7 +523,7 @@ export function OnlineOrdersContent() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Extra Dry</span>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setExtraDryLoads(Math.max(0, extraDryLoads - 1))} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-sm font-bold hover:bg-muted/80">âˆ’</button>
+                  <button onClick={() => setExtraDryLoads(Math.max(0, extraDryLoads - 1))} className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-sm font-bold hover:bg-muted/80">−</button>
                   <span className="text-sm font-bold w-5 text-center">{extraDryLoads}</span>
                   <button onClick={() => setExtraDryLoads(extraDryLoads + 1)} className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold hover:bg-primary/90">+</button>
                 </div>
@@ -549,7 +532,6 @@ export function OnlineOrdersContent() {
           </div>
         </div>
 
-        {/* Bag Card Number - 5 cards */}
         <div>
           <Label className="text-sm font-semibold text-foreground mb-1 block">
             Bag Card Number <span className="text-destructive">*</span>
@@ -575,13 +557,12 @@ export function OnlineOrdersContent() {
           {bagCardNumber && (
             <div className="mt-2 p-2.5 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
               <p className="text-sm text-green-700 dark:text-green-400 font-medium">
-                âœ“ Card #{bagCardNumber} selected â€” Give matching card to customer
+                ✓ Card #{bagCardNumber} selected — Give matching card to customer
               </p>
             </div>
           )}
         </div>
 
-        {/* Service Override */}
         {(branchServices as any[]).length > 0 && (
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-center justify-between mb-1">
@@ -604,7 +585,7 @@ export function OnlineOrdersContent() {
                     onClick={() => setOverriddenServiceType(svc.code === selectedOrder.serviceType ? null : svc.code)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium border-2 transition-all ${isActive ? "border-primary bg-primary/10 text-primary" : "border-border bg-muted text-muted-foreground"}`}
                   >
-                    {svc.name} Â· â‚µ{(svc.price ?? svc.basePrice ?? 0).toFixed(2)}
+                    {svc.name} · ₵{(svc.price ?? svc.basePrice ?? 0).toFixed(2)}
                     {!svc.showOnCustomerSide && <span className="ml-1 opacity-60">(staff)</span>}
                   </button>
                 )
@@ -613,14 +594,13 @@ export function OnlineOrdersContent() {
             {overriddenServiceType && overriddenServiceType !== selectedOrder.serviceType && (
               <div className="mt-2 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 rounded-lg">
                 <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
-                  âš ï¸ Service overridden â€” pricing and history will reflect the new service
+                  ⚠️ Service overridden — pricing and history will reflect the new service
                 </p>
               </div>
             )}
           </div>
         )}
 
-        {/* Order Summary â€” bottom of page */}
         <div className="bg-card border border-border rounded-xl p-4">
           <h3 className="font-semibold text-foreground mb-3">Order Summary</h3>
           <div className="space-y-2.5 text-sm">
@@ -630,13 +610,13 @@ export function OnlineOrdersContent() {
             </div>
             {selectedOrder.whitesSeparate && (
               <div className="flex justify-between items-center bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
-                <span className="text-yellow-800 font-medium text-sm">âš ï¸ Whites Separate</span>
+                <span className="text-yellow-800 font-medium text-sm">⚠️ Whites Separate</span>
                 <span className="text-yellow-800 font-medium text-sm">+1 extra load</span>
               </div>
             )}
             {(selectedOrder as any).mixWithColors && (
               <div className="flex justify-between items-center bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-                <span className="text-blue-800 font-medium text-sm">ðŸŽ¨ Mix with Colors</span>
+                <span className="text-blue-800 font-medium text-sm">🎨 Mix with Colors</span>
                 <span className="text-blue-800 font-medium text-sm">Wash together</span>
               </div>
             )}
@@ -654,24 +634,24 @@ export function OnlineOrdersContent() {
               <>
                 <div className="border-t border-border pt-2 space-y-1.5">
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>{pricing.numberOfLoads} load{pricing.numberOfLoads !== 1 ? "s" : ""} Ã— GHS {pricing.pricePerLoad.toFixed(2)}</span>
+                    <span>{pricing.numberOfLoads} load{pricing.numberOfLoads !== 1 ? "s" : ""} × GHS {pricing.pricePerLoad.toFixed(2)}</span>
                     <span>GHS {(pricing.numberOfLoads * pricing.pricePerLoad).toFixed(2)}</span>
                   </div>
                   {pricing.whitesExtraLoad > 0 && (
                     <div className="flex justify-between text-xs bg-yellow-50 text-yellow-800 rounded px-1 py-0.5">
-                      <span>âš ï¸ Whites separate (+{pricing.whitesExtraLoad} load)</span>
+                      <span>⚠️ Whites separate (+{pricing.whitesExtraLoad} load)</span>
                       <span>GHS {(pricing.whitesExtraLoad * pricing.pricePerLoad).toFixed(2)}</span>
                     </div>
                   )}
                   {extraWashLoads > 0 && (
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>+{extraWashLoads} extra wash Ã— GHS {getExtraWashPrice().toFixed(2)}</span>
+                      <span>+{extraWashLoads} extra wash × GHS {getExtraWashPrice().toFixed(2)}</span>
                       <span>GHS {pricing.extraWashCost.toFixed(2)}</span>
                     </div>
                   )}
                   {extraDryLoads > 0 && (
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>+{extraDryLoads} extra dry Ã— GHS {getExtraDryPrice().toFixed(2)}</span>
+                      <span>+{extraDryLoads} extra dry × GHS {getExtraDryPrice().toFixed(2)}</span>
                       <span>GHS {pricing.extraDryCost.toFixed(2)}</span>
                     </div>
                   )}
@@ -684,7 +664,7 @@ export function OnlineOrdersContent() {
                 </div>
                 {selectedOrder.finalPrice < selectedOrder.totalPrice && (
                   <div className="flex justify-between text-xs text-purple-600 font-medium">
-                    <span>ðŸŽ Loyalty/Discount Applied</span>
+                    <span>🎁 Loyalty/Discount Applied</span>
                     <span>-GHS {(selectedOrder.totalPrice - selectedOrder.finalPrice).toFixed(2)}</span>
                   </div>
                 )}
@@ -706,7 +686,6 @@ export function OnlineOrdersContent() {
         </div>
       </div>
 
-      {/* Sticky footer actions */}
       <div className="sticky bottom-0 bg-card border-t border-border p-3 flex items-center justify-between gap-3 z-50">
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="text-destructive border-destructive/30" onClick={handleRejectClick}>
@@ -750,7 +729,6 @@ export function OnlineOrdersContent() {
     <div className="flex h-[calc(100vh-73px)] overflow-hidden">
       {QueuePanel}
       {DetailPanel}
-
       <ActionVerification
         open={showRejectVerification}
         onCancel={() => setShowRejectVerification(false)}
