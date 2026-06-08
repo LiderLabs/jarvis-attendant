@@ -194,12 +194,12 @@ export function OnlineOrdersContent() {
     const extraDryCost = extraDryLoads * getExtraDryPrice()
     // Use global delivery pricing based on the selected delivery option
     const getOptionFee = () => {
-      if (!selectedOrder.isDelivery || !deliveryPricing) return 0;
+      const dp = (deliveryPricing as any); if (!selectedOrder.isDelivery || !dp) return 0;
       const option = selectedOrder.deliveryOption as string | undefined;
-      if (option === 'dropoff_delivery') return deliveryPricing.dropoff_delivery ?? 0;
-      if (option === 'pickup_self') return deliveryPricing.pickup_self ?? 0;
-      if (option === 'full_service') return deliveryPricing.full_service ?? 0;
-      return deliveryPricing.dropoff_self ?? 0;
+      if (option === 'dropoff_delivery') return dp.dropoff_delivery ?? 0;
+      if (option === 'pickup_self') return dp.pickup_self ?? 0;
+      if (option === 'full_service') return dp.full_service ?? 0;
+      return dp.dropoff_self ?? 0;
     }
     const deliveryFee = getOptionFee()
     return { numberOfLoads, whitesExtraLoad, totalLoads, pricePerLoad, basePrice, deliveryFee, extraWashCost, extraDryCost, total: basePrice + extraWashCost + extraDryCost + deliveryFee }

@@ -68,7 +68,7 @@ function OrderCard({
             </span>
           </div>
           <p className="text-xs text-muted-foreground truncate">
-            {order.customerName || order.customerPhoneNumber} · {getServiceLabel(order.serviceType)} · {deliveryOptionLabel}
+            {order.customerName || order.customerPhoneNumber} · {getServiceLabel(order.serviceType)} · {deliveryLabel}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -100,7 +100,7 @@ function OrderCard({
           <div className="flex items-start gap-3 p-3 rounded-xl bg-muted/40 border border-border">
             <Home className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-muted-foreground mb-0.5">{deliveryOptionLabel} · Address</p>
+              <p className="text-xs text-muted-foreground mb-0.5">{deliveryLabel} · Address</p>
               <p className="font-medium text-sm">{deliveryLabel || 'No address provided'}</p>
             </div>
             {mapsUrl && (
