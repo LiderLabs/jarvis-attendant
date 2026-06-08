@@ -118,7 +118,8 @@ export function OnlineOrdersContent() {
     attendantId: Id<"attendants">,
     verificationId: Id<"biometricVerifications">
   ) => {
-    if (!selectedOrder || !stationToken) { toast.error("Please select an order"); return }
+    if (!selectedOrder || !stationToken) { toast.error("Please select an order");
+  const deliveryPricing = useQuery((api as any).admin.getDeliveryPricing) return }
     try {
       await cancelOrder({
         stationToken,
