@@ -57,7 +57,7 @@ function OrderCard({
   const [expanded, setExpanded] = useState(queue !== 'delivered')
   const [showCashConfirm, setShowCashConfirm] = useState(false)
 
-  const isPickupSelf = order.deliveryOption === 'pickup_self'
+  const isPickupSelf = order.deliveryOption === 'pickup_self' || order.deliveryOption === 'full_service'
 
   const addressLabel = [
     order.deliveryHall,
@@ -181,17 +181,17 @@ function OrderCard({
 
           {/* Actions */}
           {queue === 'ready' && (
-            isPickupSelf ? (
-              // pickup_self: go collect from customer
+            (order.deliveryOption === 'pickup_self' || order.deliveryOption === 'full_service') ? (
+              // pickup_self / full_service: driver goes to customer to collect
               onCollectFromCustomer && (
                 <Button onClick={() => onCollectFromCustomer(order._id)} disabled={collecting}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2 h-11 rounded-xl font-semibold">
                   {collecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowDown className="w-4 h-4" />}
-                  Go Collect from Customer
+                  {order.deliveryOption === 'full_service' ? 'Go Collect from Customer' : 'Go Collect from Customer'}
                 </Button>
               )
             ) : (
-              // dropoff_delivery / full_service: pick up from branch
+              // dropoff_delivery / dropoff_self: laundry already at branch, pick up and deliver
               onPickUp && (
                 <Button onClick={() => onPickUp(order._id)} disabled={pickingUp}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2 h-11 rounded-xl font-semibold">
@@ -203,8 +203,8 @@ function OrderCard({
           )}
 
           {queue === 'inTransit' && onDeliver && (
-            isPickupSelf ? (
-              // pickup_self in transit = collected from customer, now deliver to branch (just confirm arrival)
+            (order.deliveryOption === 'pickup_self' || order.deliveryOption === 'full_service') ? (
+              // pickup_self / full_service in transit = collected from customer, heading to branch
               <Button onClick={() => onDeliver(order._id, false)} disabled={delivering}
                 className="w-full bg-green-600 hover:bg-green-700 text-white gap-2 h-11 rounded-xl font-semibold">
                 {delivering ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
