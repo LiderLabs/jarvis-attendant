@@ -57,7 +57,9 @@ function OrderCard({
   const [expanded, setExpanded] = useState(queue !== 'delivered')
   const [showCashConfirm, setShowCashConfirm] = useState(false)
 
-  const isPickupSelf = order.deliveryOption === 'pickup_self' || order.deliveryOption === 'full_service'
+  // full_service second trip: already collected from customer, now delivering — treat like delivery
+  const isPickupSelf = order.deliveryOption === 'pickup_self' || 
+    (order.deliveryOption === 'full_service' && order.driverStatus !== 'collected_from_customer')
 
   const addressLabel = [
     order.deliveryHall,
@@ -181,13 +183,14 @@ function OrderCard({
 
           {/* Actions */}
           {queue === 'ready' && (
-            (order.deliveryOption === 'pickup_self' || order.deliveryOption === 'full_service') ? (
-              // pickup_self / full_service: driver goes to customer to collect
+            (order.deliveryOption === 'pickup_self' || 
+              (order.deliveryOption === 'full_service' && order.driverStatus !== 'collected_from_customer')) ? (
+              // pickup_self / full_service first trip: driver goes to customer to collect
               onCollectFromCustomer && (
                 <Button onClick={() => onCollectFromCustomer(order._id)} disabled={collecting}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2 h-11 rounded-xl font-semibold">
                   {collecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowDown className="w-4 h-4" />}
-                  {order.deliveryOption === 'full_service' ? 'Go Collect from Customer' : 'Go Collect from Customer'}
+                  Go Collect from Customer
                 </Button>
               )
             ) : (
