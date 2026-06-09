@@ -182,7 +182,7 @@ export default function LoginPage() {
               <Logo className="h-8 w-auto" />
             </div>
             <div className="space-y-2">
-              <CardTitle className="text-2xl font-bold">WashStation</CardTitle>
+              <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
               <CardDescription className="text-base">
                 Enter your branch code to begin
               </CardDescription>
@@ -231,7 +231,7 @@ export default function LoginPage() {
           </CardContent>
         </Card>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm">
-          Â© {new Date().getFullYear()} Rapid Wash Â· Powered by Lider Technologies LTD
+          © {new Date().getFullYear()} Rapid Wash · Powered by Lider Technologies LTD
         </div>
       </div>
     );
@@ -245,7 +245,7 @@ export default function LoginPage() {
             <div className="flex justify-center">
               <Logo className="h-8 w-auto" />
             </div>
-            <CardTitle className="text-2xl font-bold">WashStation</CardTitle>
+            <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
             <CardDescription className="text-base">
               Branch Information
             </CardDescription>
@@ -309,7 +309,7 @@ export default function LoginPage() {
             <div className="flex justify-center">
               <Logo className="h-8 w-auto" />
             </div>
-            <CardTitle className="text-2xl font-bold">WashStation</CardTitle>
+            <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
             <CardDescription className="text-base">
               Station Login Required
             </CardDescription>
@@ -400,7 +400,7 @@ export default function LoginPage() {
             <div className="flex justify-center">
               <Logo className="h-8 w-auto" />
             </div>
-            <CardTitle className="text-2xl font-bold">WashStation</CardTitle>
+            <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
             <CardDescription className="text-base">
               Sign in to continue
             </CardDescription>

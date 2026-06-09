@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Logo } from '@/components/Logo'
+import Image from 'next/image'
 import { Loader2, ArrowRight, Lock, Phone, Truck } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -57,9 +58,6 @@ export default function DriverLoginPage() {
           <CardHeader className="text-center space-y-4 pb-6">
             <div className="flex justify-center">
               <Logo className="h-8 w-auto" />
-            </div>
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-              <Truck className="w-8 h-8 text-primary" />
             </div>
             <div className="space-y-1">
               <CardTitle className="text-2xl font-bold">Driver Portal</CardTitle>
@@ -116,9 +114,6 @@ export default function DriverLoginPage() {
               </Button>
             </form>
 
-            <p className="text-xs text-center text-muted-foreground mt-6">
-              Contact your branch manager if you need access
-            </p>
           </CardContent>
         </Card>
 
