@@ -179,7 +179,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md border-2 shadow-2xl">
           <CardHeader className="text-center space-y-4 pb-6">
             <div className="flex justify-center">
-              <Logo className="h-8 w-auto" />
+              <Logo size="xs" />
             </div>
             <div className="space-y-2">
               <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
@@ -243,7 +243,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md border-2 shadow-2xl">
           <CardHeader className="text-center space-y-4 pb-6">
             <div className="flex justify-center">
-              <Logo className="h-8 w-auto" />
+              <Logo size="xs" />
             </div>
             <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
             <CardDescription className="text-base">
@@ -307,7 +307,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md border-2 shadow-2xl">
           <CardHeader className="text-center space-y-4 pb-6">
             <div className="flex justify-center">
-              <Logo className="h-8 w-auto" />
+              <Logo size="xs" />
             </div>
             <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
             <CardDescription className="text-base">
@@ -398,7 +398,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md border-2 shadow-2xl">
           <CardHeader className="text-center space-y-4 pb-6">
             <div className="flex justify-center">
-              <Logo className="h-8 w-auto" />
+              <Logo size="xs" />
             </div>
             <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
             <CardDescription className="text-base">
