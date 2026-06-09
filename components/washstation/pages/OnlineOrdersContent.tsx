@@ -396,7 +396,11 @@ export function OnlineOrdersContent() {
                   : selectedOrder.deliveryAddress || "Address on file"}
               </p>
               <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
-                After payment → Mark Ready for Delivery so driver can collect
+                {(selectedOrder as any).driverStatus === 'collected_from_customer'
+                  ? '✓ Driver collected — process laundry then mark Ready for Delivery'
+                  : (selectedOrder as any).deliveryOption === 'pickup_self'
+                  ? 'Driver will collect from customer — process and notify when ready'
+                  : 'After payment → Mark Ready for Delivery so driver can collect'}
               </p>
             </div>
           </div>
