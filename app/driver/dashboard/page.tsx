@@ -23,14 +23,15 @@ export default function DriverDashboard() {
     setDriverToken(token)
   }, [router])
 
-  const orders = useQuery(
-    (api as any).drivers.getDeliveryQueue,
+  // getDeliveryOrders returns { readyForPickup, pickedUp, delivered, all }
+  const deliveryData = useQuery(
+    (api as any).drivers.getDeliveryOrders,
     driverToken ? { driverToken } : 'skip'
-  ) ?? []
+  )
 
   const markDelivered = useMutation((api as any).drivers.markDelivered)
   const markCollected = useMutation((api as any).drivers.markCollectedFromCustomer)
-  const logoutMutation = useMutation((api as any).drivers.logout)
+  const logoutMutation = useMutation((api as any).drivers.logoutDriver)
 
   const handleMarkDelivered = async (orderId: string) => {
     if (!driverToken) return
@@ -76,15 +77,16 @@ export default function DriverDashboard() {
 
   if (!driverToken) return null
 
-  const pending = (orders as any[]).filter((o) => o.driverStatus === 'pending_pickup' || !o.driverStatus)
-  const collected = (orders as any[]).filter((o) => o.driverStatus === 'collected_from_customer')
+  const pending = (deliveryData?.readyForPickup ?? []) as any[]
+  const collected = (deliveryData?.pickedUp ?? []) as any[]
+  const totalCount = pending.length + collected.length
 
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex items-center justify-between">
         <div>
           <h1 className="font-semibold text-lg">Deliveries</h1>
-          <p className="text-xs text-muted-foreground">{(orders as any[]).length} order{(orders as any[]).length !== 1 ? 's' : ''} pending</p>
+          <p className="text-xs text-muted-foreground">{totalCount} order{totalCount !== 1 ? 's' : ''} pending</p>
         </div>
         <Button variant="ghost" size="sm" onClick={handleLogout}>
           <LogOut className="h-4 w-4 mr-1" />
@@ -93,7 +95,14 @@ export default function DriverDashboard() {
       </div>
 
       <div className="p-4 space-y-3 max-w-lg mx-auto">
-        {(orders as any[]).length === 0 && (
+        {deliveryData === undefined && (
+          <div className="text-center py-16 text-muted-foreground">
+            <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin opacity-40" />
+            <p className="text-sm">Loading...</p>
+          </div>
+        )}
+
+        {deliveryData !== undefined && totalCount === 0 && (
           <div className="text-center py-16 text-muted-foreground">
             <Package className="h-10 w-10 mx-auto mb-3 opacity-40" />
             <p className="text-sm">No deliveries right now</p>
