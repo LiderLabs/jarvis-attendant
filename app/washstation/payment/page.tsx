@@ -87,6 +87,7 @@ function PaymentContent() {
 
   const applyVoucherMutation  = useMutation((api as any).vouchers.applyToOrder);
   const redeemLoyaltyMutation = useMutation((api as any).loyalty.redeemPointsForAttendant);
+  const markReadyForDelivery = useMutation((api as any).drivers.markReadyForDelivery)
 
   const orderIdParam = searchParams?.get("orderId");
   const returnTo     = searchParams?.get("return");
@@ -117,7 +118,7 @@ function PaymentContent() {
   const hasLoyaltyReward = loyaltyPoints >= 10;
   const [useLoyalty, setUseLoyalty] = useState(false);
 
-  const voucherValidation = useQuery(
+  const voucherValidation = useQuery(
     (api as any).vouchers.validate,
     voucherCode.length >= 6 && order
       ? { code: voucherCode.toUpperCase(), orderTotal: order.totalPrice ?? 1, branchId: order.branchId }
@@ -161,9 +162,14 @@ function PaymentContent() {
             result.method === "card" ? "Card" : "Cash"
           } — ₵${result.amount?.toFixed(2)}`
         );
-        router.push(
+        (async () => {
+      if ((order as any)?.isDelivery && stationToken) {
+        try { await markReadyForDelivery({ orderId: order._id, stationToken }); } catch (_) {}
+      }
+      router.push(
           `/washstation/order-complete?orderId=${order._id}&paymentMethod=${result.method}&amountPaid=${result.amount}&changeDue=0`
         );
+    })();
       } else if (result.alreadyPaid) {
         toast.info("Payment was already recorded.");
         router.push(`/washstation/orders/${order._id}`);
@@ -227,7 +233,12 @@ function PaymentContent() {
       try {
         await redeemLoyaltyMutation({ orderId: order._id, stationToken: stationToken!, pointsToRedeem: 10 });
         toast.success("Loyalty points redeemed! Order marked as paid.");
-        router.push(`/washstation/order-complete?orderId=${order._id}&paymentMethod=loyalty&amountPaid=0&changeDue=0`);
+        (async () => {
+      if ((order as any)?.isDelivery && stationToken) {
+        try { await markReadyForDelivery({ orderId: order._id, stationToken }); } catch (_) {}
+      }
+      router.push(`/washstation/order-complete?orderId=${order._id}&paymentMethod=loyalty&amountPaid=0&changeDue=0`);
+    })();
       } catch (e: any) {
         toast.error(e?.message || "Failed to redeem loyalty points");
         setStage("idle");
@@ -308,7 +319,12 @@ function PaymentContent() {
         await applyVoucherMutation({ voucherCode: voucherCode.trim().toUpperCase(), orderId: order._id });
       }
       toast.success("Voucher applied! Order marked as paid.");
+      (async () => {
+      if ((order as any)?.isDelivery && stationToken) {
+        try { await markReadyForDelivery({ orderId: order._id, stationToken }); } catch (_) {}
+      }
       router.push(`/washstation/order-complete?orderId=${order._id}&paymentMethod=voucher&amountPaid=0&changeDue=0`);
+    })();
     } catch (e: any) {
       toast.error(e?.message || "Failed to apply voucher");
       setStage("idle");
@@ -473,9 +489,14 @@ function PaymentContent() {
       isPaying.current = false;
       currentPaymentId.current = null;
 
+      (async () => {
+      if ((order as any)?.isDelivery && stationToken) {
+        try { await markReadyForDelivery({ orderId: order._id, stationToken }); } catch (_) {}
+      }
       router.push(
         `/washstation/order-complete?orderId=${order._id}&paymentMethod=${effectivePaymentMethod}&amountPaid=${customerFacingAmount}&changeDue=0`
       );
+    })();
     } catch (error) {
       toast.dismiss("finalizing");
       toast.error(error instanceof Error ? error.message : "Failed to finalize payment");
