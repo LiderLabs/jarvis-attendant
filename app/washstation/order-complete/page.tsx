@@ -80,7 +80,7 @@ function OrderCompleteContent() {
 
   // Auto-open WhatsApp for delivery orders once order loads
   useEffect(() => {
-    if (!isDeliveryOrder || !order || isLoading) return;
+    if (!order || isLoading) return;
     const rawPhone = order?.customer?.phoneNumber || (order as any)?.customerPhoneNumber || '';
     if (!rawPhone) return;
     const phone = rawPhone.replace(/[\s\-]/g, '').replace(/^\+/, '').replace(/^0/, '233');
@@ -171,14 +171,6 @@ function OrderCompleteContent() {
             Send Receipt via WhatsApp
           </Button>
 
-          {isDeliveryOrder && (
-            <Button
-              onClick={() => router.push('/driver/dashboard')}
-              className="w-full max-w-md h-14 bg-primary text-primary-foreground rounded-xl text-lg font-semibold mb-3"
-            >
-              Go to Driver Dashboard
-            </Button>
-          )}
 
           <Button
             onClick={() => router.push('/washstation/new-order')}
