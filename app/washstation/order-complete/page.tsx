@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import WashStationSidebar from '@/components/washstation/WashStationSidebar';
@@ -9,7 +9,6 @@ import { useStationOrder } from '@/hooks/useStationOrders';
 import { Id } from '@jordan6699/washlab-backend/dataModel';
 import { CheckCircle, Plus, MessageSquare, LayoutDashboard, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { DeliveryHandoffCard } from '@/components/washstation/DeliveryHandoffCard';
 
 function formatServiceType(code: string | undefined): string {
   if (!code) return 'Laundry';
@@ -44,39 +43,52 @@ function OrderCompleteContent() {
     return labels[method] || 'Card';
   };
 
-  const handleWhatsAppReceipt = () => {
-    const rawPhone = order?.customer?.phoneNumber || (order as any)?.customerPhoneNumber || (order as any)?.customerPhone || '';
-    if (!rawPhone) { toast.error('No phone number on file'); return; }
-    const phone = rawPhone.replace(/[\s\-]/g, '').replace(/^\+/, '').replace(/^0/, '233');
-    if (!phone) { toast.error('Invalid phone number'); return; }
+  const buildWhatsAppMessage = () => {
     const name = order?.customer?.name || 'Customer';
     const num = order?.orderNumber || orderIdParam || '';
     const price = (order?.finalPrice != null ? order.finalPrice : amountPaid).toFixed(2);
     const service = formatServiceType(order?.serviceType);
     const weight = order?.estimatedWeight ?? order?.actualWeight ?? 0;
     const serviceDesc = weight > 0 ? `${service} (${weight.toFixed(1)}kg)` : service;
-    const bagCard = order?.bagCardNumber ? `Bag Card: *#${order.bagCardNumber}*\n` : '';
-    const loads = order?.estimatedLoads ?? 1;
-    const deliveryLine = isDeliveryOrder ? `Delivery: *Yes*\n` : '';
-    const msg =
-      `🧺 Rapid Wash Receipt\n\n` +
-      `Hi ${name},\n` +
-      `Thank you for using Rapid Wash!\n\n` +
-      `Order: *#${num}*\n` +
-      `Service: ${serviceDesc}\n` +
-      `Wash Cycles: *${loads} load${loads !== 1 ? 's' : ''}*\n` +
-      deliveryLine +
-      `Amount Paid: *GHS ${price}*\n` +
-      `Payment: ${getPaymentMethodLabel(paymentMethod)}\n` +
-      bagCard +
-      `Phone: ${rawPhone}\n\n` +
-      (isDeliveryOrder
-        ? `Your laundry will be delivered to you once ready. 🚚\n`
-        : `Please bring your bag card when collecting your laundry.\n`) +
-      `We appreciate your business! 🙏`;
-    window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
-    toast.success('WhatsApp receipt opened!');
+
+    if (isDeliveryOrder) {
+      return (
+        `Hi ${name}, your laundry order #${num} has been received and is being processed.\n\n` +
+        `Service: ${serviceDesc}\n` +
+        `Amount Paid: GHS ${price} (${getPaymentMethodLabel(paymentMethod)})\n\n` +
+        `Your laundry will be delivered to you once ready. Thank you for choosing Rapid Wash!`
+      );
+    } else {
+      return (
+        `Hi ${name}, your laundry order #${num} has been received.\n\n` +
+        `Service: ${serviceDesc}\n` +
+        `Amount Paid: GHS ${price} (${getPaymentMethodLabel(paymentMethod)})\n\n` +
+        `We will notify you when your laundry is ready. Thank you for choosing Rapid Wash!`
+      );
+    }
   };
+
+  const handleWhatsAppReceipt = () => {
+    const rawPhone = order?.customer?.phoneNumber || (order as any)?.customerPhoneNumber || '';
+    if (!rawPhone) { toast.error('No phone number on file'); return; }
+    const phone = rawPhone.replace(/[\s\-]/g, '').replace(/^\+/, '').replace(/^0/, '233');
+    if (!phone) { toast.error('Invalid phone number'); return; }
+    const msg = buildWhatsAppMessage();
+    window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+    toast.success('WhatsApp opened!');
+  };
+
+  // Auto-open WhatsApp for delivery orders once order loads
+  useEffect(() => {
+    if (!isDeliveryOrder || !order || isLoading) return;
+    const rawPhone = order?.customer?.phoneNumber || (order as any)?.customerPhoneNumber || '';
+    if (!rawPhone) return;
+    const phone = rawPhone.replace(/[\s\-]/g, '').replace(/^\+/, '').replace(/^0/, '233');
+    if (!phone) return;
+    const msg = buildWhatsAppMessage();
+    window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?._id]);
 
   const orderSummaryLines: { name: string; notes?: string; quantity: number; price: number }[] = [];
   if (order) {
@@ -125,12 +137,6 @@ function OrderCompleteContent() {
             </h1>
           )}
 
-          {isDeliveryOrder && (
-            <span className="mb-4 px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-sm font-medium rounded-full">
-              🚚 Delivery Order
-            </span>
-          )}
-
           {/* Order Summary */}
           <div className="w-full max-w-md bg-card border border-border rounded-2xl overflow-hidden mb-6">
             <div className="p-5 border-b border-border flex items-center justify-between">
@@ -157,21 +163,6 @@ function OrderCompleteContent() {
             </div>
           </div>
 
-          {/* Delivery Handoff Card — only for delivery orders */}
-          {isDeliveryOrder && stationToken && orderIdParam && (
-            <DeliveryHandoffCard
-              orderId={orderIdParam as Id<'orders'>}
-              stationToken={stationToken}
-              deliveryAddress={(order as any)?.deliveryAddress}
-              deliveryHall={(order as any)?.deliveryHall}
-              deliveryRoom={(order as any)?.deliveryRoom}
-              customerPhone={order?.customer?.phoneNumber || (order as any)?.customerPhoneNumber}
-              orderStatus={order?.status}
-              driverStatus={(order as any)?.driverStatus}
-              assignedDriverId={(order as any)?.assignedDriverId}
-            />
-          )}
-
           <Button
             onClick={handleWhatsAppReceipt}
             className="w-full max-w-md h-14 bg-[#25D366] hover:bg-[#20BA5A] text-white rounded-xl text-lg font-semibold mb-3"
@@ -179,6 +170,15 @@ function OrderCompleteContent() {
             <MessageSquare className="w-5 h-5 mr-2" />
             Send Receipt via WhatsApp
           </Button>
+
+          {isDeliveryOrder && (
+            <Button
+              onClick={() => router.push('/driver/dashboard')}
+              className="w-full max-w-md h-14 bg-primary text-primary-foreground rounded-xl text-lg font-semibold mb-3"
+            >
+              Go to Driver Dashboard
+            </Button>
+          )}
 
           <Button
             onClick={() => router.push('/washstation/new-order')}
