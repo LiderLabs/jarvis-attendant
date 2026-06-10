@@ -15,7 +15,7 @@ export default function DriverDashboard() {
   const [loadingOrderId, setLoadingOrderId] = useState<string | null>(null)
 
   useEffect(() => {
-    const token = sessionStorage.getItem('driverToken')
+    const token = localStorage.getItem('driver_token')
     if (!token) {
       router.push('/driver-login')
       return
@@ -63,7 +63,7 @@ export default function DriverDashboard() {
     if (driverToken) {
       try { await logoutMutation({ driverToken }) } catch {}
     }
-    sessionStorage.removeItem('driverToken')
+    localStorage.removeItem('driver_token')
     router.push('/driver-login')
   }
 
