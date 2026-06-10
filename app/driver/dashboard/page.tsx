@@ -4,20 +4,23 @@ import { useState, useEffect } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '@jordan6699/washlab-backend/api'
 import { useRouter } from 'next/navigation'
-import { MapPin, Phone, Package, CheckCircle2, Loader2, LogOut } from 'lucide-react'
+import { MapPin, Phone, Package, CheckCircle2, Loader2, LogOut, Circle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Logo } from '@/components/Logo'
 import { toast } from 'sonner'
 
-function getActionLabel(deliveryOption: string, stage: 'ready' | 'collected') {
-  if (stage === 'ready') {
-    if (deliveryOption === 'pickup_self' || deliveryOption === 'full_service') return 'Pick Up from Customer'
-    return 'Collect from Station'
-  } else {
-    if (deliveryOption === 'pickup_self') return 'Drop Off at Station'
-    return 'Deliver to Customer'
-  }
+type Tab = 'active' | 'transit' | 'completed'
+
+function getActiveLabel(deliveryOption: string) {
+  if (deliveryOption === 'dropoff_delivery') return 'Collect from Station'
+  return 'Pick Up from Customer' // pickup_self, full_service
+}
+
+function getTransitLabel(deliveryOption: string) {
+  if (deliveryOption === 'dropoff_delivery') return 'Delivered to Customer'
+  if (deliveryOption === 'pickup_self') return 'Dropped Off at Station'
+  return 'Dropped Off at Station' // full_service leg 1; backend re-queues for leg 2
 }
 
 function getServiceLabel(deliveryOption: string) {
@@ -31,6 +34,7 @@ export default function DriverDashboard() {
   const router = useRouter()
   const [driverToken, setDriverToken] = useState<string | null>(null)
   const [driverName, setDriverName] = useState('')
+  const [activeTab, setActiveTab] = useState<Tab>('active')
   const [loadingOrderId, setLoadingOrderId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -46,17 +50,31 @@ export default function DriverDashboard() {
     driverToken ? { driverToken } : 'skip'
   )
 
+  const markPickedUp = useMutation((api as any).drivers.markPickedUp)
   const markDelivered = useMutation((api as any).drivers.markDelivered)
-  const markCollected = useMutation((api as any).drivers.markCollectedFromCustomer)
   const logoutMutation = useMutation((api as any).drivers.logoutDriver)
 
-  const handleAction = async (orderId: string, stage: 'ready' | 'collected') => {
+  const handleActive = async (orderId: string) => {
     if (!driverToken) return
     setLoadingOrderId(orderId)
     try {
-      if (stage === 'ready') await markCollected({ orderId: orderId as any, driverToken })
-      else await markDelivered({ orderId: orderId as any, driverToken })
-      toast.success('Order updated')
+      await markPickedUp({ orderId: orderId as any, driverToken })
+      toast.success('Order moved to In Transit')
+      setActiveTab('transit')
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to update order')
+    } finally {
+      setLoadingOrderId(null)
+    }
+  }
+
+  const handleTransit = async (orderId: string) => {
+    if (!driverToken) return
+    setLoadingOrderId(orderId)
+    try {
+      await markDelivered({ orderId: orderId as any, driverToken })
+      toast.success('Order completed')
+      setActiveTab('completed')
     } catch (e: any) {
       toast.error(e?.message || 'Failed to update order')
     } finally {
@@ -80,18 +98,27 @@ export default function DriverDashboard() {
 
   if (!driverToken) return null
 
-  const pending = (deliveryData?.readyForPickup ?? []) as any[]
-  const collected = (deliveryData?.pickedUp ?? []) as any[]
-  const totalCount = pending.length + collected.length
+  const active = (deliveryData?.readyForPickup ?? []) as any[]
+  const transit = (deliveryData?.pickedUp ?? []) as any[]
+  const completed = (deliveryData?.delivered ?? []) as any[]
+
+  const tabCounts = { active: active.length, transit: transit.length, completed: completed.length }
+  const currentOrders = activeTab === 'active' ? active : activeTab === 'transit' ? transit : completed
+
+  const tabs: { key: Tab; label: string }[] = [
+    { key: 'active', label: 'Active' },
+    { key: 'transit', label: 'In Transit' },
+    { key: 'completed', label: 'Completed' },
+  ]
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b px-4 py-3">
+      <div className="bg-background border-b px-4 py-3">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Logo size="xs" />
-            <div className="w-px h-6 bg-border" />
+            <div className="w-px h-5 bg-border" />
             <div>
               <p className="font-semibold text-sm leading-tight">Driver Portal</p>
               {driverName && <p className="text-xs text-muted-foreground">{driverName}</p>}
@@ -104,16 +131,41 @@ export default function DriverDashboard() {
         </div>
       </div>
 
-      {/* Summary bar */}
-      <div className="bg-primary/5 border-b px-4 py-2">
-        <div className="max-w-lg mx-auto">
-          <p className="text-sm font-medium text-primary">
-            {totalCount === 0 ? 'No pending deliveries' : `${totalCount} order${totalCount !== 1 ? 's' : ''} to action`}
-          </p>
+      {/* Tabs */}
+      <div className="border-b bg-background sticky top-0 z-10">
+        <div className="max-w-lg mx-auto flex">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex-1 py-3 text-sm font-medium relative transition-colors ${
+                activeTab === tab.key
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <span className="flex items-center justify-center gap-1.5">
+                {tab.label}
+                {tabCounts[tab.key] > 0 && (
+                  <span className={`text-xs font-bold rounded-full px-1.5 py-0.5 ${
+                    activeTab === tab.key
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {tabCounts[tab.key]}
+                  </span>
+                )}
+              </span>
+              {activeTab === tab.key && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="p-4 space-y-5 max-w-lg mx-auto">
+      {/* Content */}
+      <div className="flex-1 p-4 max-w-lg mx-auto w-full space-y-3">
         {deliveryData === undefined && (
           <div className="text-center py-20 text-muted-foreground">
             <Loader2 className="h-7 w-7 mx-auto mb-3 animate-spin opacity-40" />
@@ -121,63 +173,53 @@ export default function DriverDashboard() {
           </div>
         )}
 
-        {deliveryData !== undefined && totalCount === 0 && (
+        {deliveryData !== undefined && currentOrders.length === 0 && (
           <div className="text-center py-20 text-muted-foreground">
             <Package className="h-10 w-10 mx-auto mb-3 opacity-25" />
-            <p className="font-semibold">All clear</p>
-            <p className="text-sm mt-1 opacity-70">No deliveries right now</p>
+            <p className="font-semibold">Nothing here</p>
+            <p className="text-sm mt-1 opacity-70">
+              {activeTab === 'active' && 'No orders waiting for pickup'}
+              {activeTab === 'transit' && 'No orders currently in transit'}
+              {activeTab === 'completed' && 'No completed deliveries yet'}
+            </p>
           </div>
         )}
 
-        {pending.length > 0 && (
-          <section className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Action Required</span>
-              <span className="bg-primary text-primary-foreground text-xs font-bold rounded-full px-2 py-0.5">{pending.length}</span>
-            </div>
-            {pending.map((order: any) => (
-              <OrderCard
-                key={order._id}
-                order={order}
-                actionLabel={getActionLabel(order.deliveryOption, 'ready')}
-                serviceLabel={getServiceLabel(order.deliveryOption)}
-                onAction={() => handleAction(order._id, 'ready')}
-                onOpenMaps={() => openMaps(order.deliveryLat, order.deliveryLng, order.deliveryAddress)}
-                loading={loadingOrderId === order._id}
-              />
-            ))}
-          </section>
-        )}
-
-        {collected.length > 0 && (
-          <section className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">In Progress</span>
-              <span className="bg-muted text-muted-foreground text-xs font-bold rounded-full px-2 py-0.5">{collected.length}</span>
-            </div>
-            {collected.map((order: any) => (
-              <OrderCard
-                key={order._id}
-                order={order}
-                actionLabel={getActionLabel(order.deliveryOption, 'collected')}
-                serviceLabel={getServiceLabel(order.deliveryOption)}
-                onAction={() => handleAction(order._id, 'collected')}
-                onOpenMaps={() => openMaps(order.deliveryLat, order.deliveryLng, order.deliveryAddress)}
-                loading={loadingOrderId === order._id}
-              />
-            ))}
-          </section>
-        )}
+        {currentOrders.map((order: any) => (
+          <OrderCard
+            key={order._id}
+            order={order}
+            tab={activeTab}
+            actionLabel={
+              activeTab === 'active'
+                ? getActiveLabel(order.deliveryOption)
+                : activeTab === 'transit'
+                ? getTransitLabel(order.deliveryOption)
+                : null
+            }
+            serviceLabel={getServiceLabel(order.deliveryOption)}
+            onAction={
+              activeTab === 'active'
+                ? () => handleActive(order._id)
+                : activeTab === 'transit'
+                ? () => handleTransit(order._id)
+                : undefined
+            }
+            onOpenMaps={() => openMaps(order.deliveryLat, order.deliveryLng, order.deliveryAddress)}
+            loading={loadingOrderId === order._id}
+          />
+        ))}
       </div>
     </div>
   )
 }
 
-function OrderCard({ order, actionLabel, serviceLabel, onAction, onOpenMaps, loading }: {
+function OrderCard({ order, tab, actionLabel, serviceLabel, onAction, onOpenMaps, loading }: {
   order: any
-  actionLabel: string
+  tab: Tab
+  actionLabel: string | null
   serviceLabel: string
-  onAction: () => void
+  onAction?: () => void
   onOpenMaps: () => void
   loading: boolean
 }) {
@@ -187,17 +229,17 @@ function OrderCard({ order, actionLabel, serviceLabel, onAction, onOpenMaps, loa
   const phone = order.deliveryPhoneNumber || order.customerPhoneNumber
 
   return (
-    <div className="rounded-2xl border bg-card p-4 space-y-3 shadow-sm">
-      {/* Top row */}
+    <div className={`rounded-2xl border bg-card p-4 space-y-3 shadow-sm ${tab === 'completed' ? 'opacity-70' : ''}`}>
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="font-bold">#{order.orderNumber}</p>
           <p className="text-sm text-muted-foreground">{order.customerName || 'Customer'}</p>
         </div>
-        <Badge variant="outline" className="text-xs shrink-0">{serviceLabel}</Badge>
+        <Badge variant={tab === 'completed' ? 'secondary' : 'outline'} className="text-xs shrink-0">
+          {serviceLabel}
+        </Badge>
       </div>
 
-      {/* Address */}
       {address && (
         <p className="text-xs text-muted-foreground flex items-start gap-1.5 leading-snug">
           <MapPin className="h-3 w-3 mt-0.5 shrink-0 text-primary" />
@@ -205,7 +247,6 @@ function OrderCard({ order, actionLabel, serviceLabel, onAction, onOpenMaps, loa
         </p>
       )}
 
-      {/* Phone */}
       {phone && (
         <a href={'tel:' + phone} className="flex items-center gap-2 text-sm text-primary font-medium">
           <Phone className="h-3.5 w-3.5" />
@@ -213,26 +254,36 @@ function OrderCard({ order, actionLabel, serviceLabel, onAction, onOpenMaps, loa
         </a>
       )}
 
-      {/* Actions */}
-      <div className="flex gap-2 pt-1">
-        {hasLocation && (
-          <Button variant="outline" size="sm" className="rounded-xl gap-1.5" onClick={onOpenMaps}>
-            <MapPin className="h-3.5 w-3.5" />
-            Maps
-          </Button>
-        )}
-        <Button
-          size="sm"
-          className="flex-1 rounded-xl gap-1.5 font-semibold"
-          onClick={onAction}
-          disabled={loading}
-        >
-          {loading
-            ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            : <CheckCircle2 className="h-3.5 w-3.5" />}
-          {actionLabel}
-        </Button>
-      </div>
+      {tab !== 'completed' && (
+        <div className="flex gap-2 pt-1">
+          {hasLocation && (
+            <Button variant="outline" size="sm" className="rounded-xl gap-1.5" onClick={onOpenMaps}>
+              <MapPin className="h-3.5 w-3.5" />
+              Maps
+            </Button>
+          )}
+          {actionLabel && onAction && (
+            <Button
+              size="sm"
+              className="flex-1 rounded-xl gap-1.5 font-semibold"
+              onClick={onAction}
+              disabled={loading}
+            >
+              {loading
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                : <CheckCircle2 className="h-3.5 w-3.5" />}
+              {actionLabel}
+            </Button>
+          )}
+        </div>
+      )}
+
+      {tab === 'completed' && (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground pt-1">
+          <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+          Completed
+        </div>
+      )}
     </div>
   )
 }
