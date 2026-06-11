@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Id } from '@jordan6699/washlab-backend/dataModel';
@@ -118,7 +118,7 @@ export function OrdersTable({ orders, stationToken, onCollectPayment, branchServ
             <TableCell className="text-muted-foreground whitespace-nowrap">
   <span>{serviceType} ({weight.toFixed(1)}kg)</span>
   {order.finalPrice > 0 && (
-    <p className="text-xs font-semibold text-foreground mt-0.5">₵{order.finalPrice.toFixed(2)}</p>
+    <p className="text-xs font-semibold text-foreground mt-0.5">?{order.finalPrice.toFixed(2)}</p>
   )}
 </TableCell>
             <TableCell className="whitespace-nowrap">

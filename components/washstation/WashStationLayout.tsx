@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import WashStationSidebar from './WashStationSidebar';
 import { MobileSidebar } from './MobileSidebar';
@@ -15,7 +15,7 @@ interface WashStationLayoutProps {
   onNotificationClick?: () => void;
 }
 
-// ─── Preload Paystack script the moment an attendant enters any washstation page.
+// --- Preload Paystack script the moment an attendant enters any washstation page.
 // By the time they reach the payment screen the script is already loaded,
 // so the popup opens instantly with no download delay.
 function usePreloadPaystack() {
@@ -27,7 +27,7 @@ function usePreloadPaystack() {
     script.src = 'https://js.paystack.co/v1/inline.js';
     script.async = true;
     document.body.appendChild(script);
-    // No cleanup — intentionally keep script loaded for the whole session
+    // No cleanup � intentionally keep script loaded for the whole session
   }, []);
 }
 

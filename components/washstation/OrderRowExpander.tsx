@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 import { useState, useCallback } from "react"
 import { useStationOrderStatus, type OrderStatus } from "@/hooks/useStationOrderStatus"
 import { ActionVerification } from "./ActionVerification"
@@ -85,7 +85,7 @@ export function OrderRowExpander({ order, stationToken: tokenProp, unpaid, onCol
     }
   }
 
-  // Verify with Paystack � checks if the customer already paid and marks order as paid if confirmed
+  // Verify with Paystack ? checks if the customer already paid and marks order as paid if confirmed
   const handleVerifyWithPaystack = async (e: React.MouseEvent) => {
     e.stopPropagation()
     setIsVerifyingPayment(true)
@@ -121,7 +121,7 @@ export function OrderRowExpander({ order, stationToken: tokenProp, unpaid, onCol
 
   return (
     <div className="flex items-center gap-1.5 flex-wrap min-w-[120px]">
-      {/* Pay button � shown when unpaid */}
+      {/* Pay button ? shown when unpaid */}
       {unpaid && onCollectPayment && (
         <button
           onClick={(e) => { e.stopPropagation(); onCollectPayment() }}
@@ -186,7 +186,7 @@ export function OrderRowExpander({ order, stationToken: tokenProp, unpaid, onCol
         </>
       )}
 
-      {/* Verify with Paystack � at the end so accidental taps don't interfere with main actions */}
+      {/* Verify with Paystack ? at the end so accidental taps don't interfere with main actions */}
       {unpaid && !isTerminal && (
         <button
           onClick={handleVerifyWithPaystack}
@@ -197,7 +197,7 @@ export function OrderRowExpander({ order, stationToken: tokenProp, unpaid, onCol
             ? <Loader2 className="w-3 h-3 animate-spin" />
             : <RefreshCw className="w-3 h-3" />
           }
-          {isVerifyingPayment ? "Checking�" : "Verify"}
+          {isVerifyingPayment ? "Checking?" : "Verify"}
         </button>
       )}
 

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -52,13 +52,13 @@ function phoneToPlaceholderEmail(localPhone: string): string {
   return `${localPhone}@washlab.app`
 }
 
-// ─── Self-hosted Convex URL fixer ────────────────────────────────────────────
+// --- Self-hosted Convex URL fixer --------------------------------------------
 const fixConvexUrl = (url: string | null | undefined): string | null => {
   if (!url) return null
   return url.replace("convex-dashboard.washlab.app", "convex-backend.washlab.app")
 }
 
-// ─── Service Image Resolver ───────────────────────────────────────────────────
+// --- Service Image Resolver ---------------------------------------------------
 const ServiceImageResolved = ({
   imageUrl,
   code,
@@ -395,7 +395,7 @@ export function NewOrderContent() {
   const services = dbServices.map((s: any) => ({
     id:       s.code,
     name:     s.name,
-    price:    "₵" + s.basePrice.toFixed(2) + " / load",
+    price:    "?" + s.basePrice.toFixed(2) + " / load",
     imageUrl: s.imageUrl,
   }))
 
@@ -442,14 +442,14 @@ export function NewOrderContent() {
         onClick={onBackspace}
         className='h-12 sm:h-14 rounded-xl bg-muted text-lg sm:text-xl font-semibold text-foreground hover:bg-muted/80 transition-colors'
       >
-        ←
+        ?
       </button>
     </div>
   )
 
   return (
     <>
-      {/* ── Phone Entry Step ─────────────────────────────────────────────── */}
+      {/* -- Phone Entry Step ----------------------------------------------- */}
       {step === "phone" && (
         <div className='max-w-6xl mx-auto'>
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8'>
@@ -488,7 +488,7 @@ export function NewOrderContent() {
         </div>
       )}
 
-      {/* ── Customer Found Step ──────────────────────────────────────────── */}
+      {/* -- Customer Found Step -------------------------------------------- */}
       {step === "customer-found" && foundCustomer && (
         <div className='max-w-2xl mx-auto'>
           <button
@@ -536,7 +536,7 @@ export function NewOrderContent() {
         </div>
       )}
 
-      {/* ── Register New Customer Step ───────────────────────────────────── */}
+      {/* -- Register New Customer Step ------------------------------------- */}
       {step === "register" && (
         <div className='max-w-2xl mx-auto'>
           <div className='flex items-center gap-2 text-xs sm:text-sm mb-6 sm:mb-8 flex-wrap'>
@@ -545,7 +545,7 @@ export function NewOrderContent() {
             </span>
             <span className='text-muted-foreground'>/</span>
             <span className='flex items-center gap-1.5 px-2 py-1 bg-primary/10 text-primary rounded font-medium text-xs sm:text-sm'>
-              ✦ Registration
+              ? Registration
             </span>
             <span className='text-muted-foreground'>/</span>
             <span className='text-muted-foreground'>Order Details</span>
@@ -564,7 +564,7 @@ export function NewOrderContent() {
                 <span className='text-foreground font-medium text-sm sm:text-base truncate'>
                   {formatPhoneDisplay(phone)}
                 </span>
-                <span className='ml-auto text-muted-foreground flex-shrink-0'>🔒</span>
+                <span className='ml-auto text-muted-foreground flex-shrink-0'>??</span>
               </div>
             </div>
 
@@ -615,10 +615,10 @@ export function NewOrderContent() {
               <div className='flex items-center justify-between mt-2'>
                 <p className='text-xs text-muted-foreground'>
                   {skipEmail
-                    ? `✓ Using: ${phoneToPlaceholderEmail(phone)}`
+                    ? `? Using: ${phoneToPlaceholderEmail(phone)}`
                     : newEmail.trim()
-                    ? '✓ Email entered'
-                    : 'No email? Tap the button →'}
+                    ? '? Email entered'
+                    : 'No email? Tap the button ?'}
                 </p>
                 <button
                   type="button"
@@ -629,7 +629,7 @@ export function NewOrderContent() {
                       : "bg-muted text-muted-foreground hover:text-foreground border-border hover:border-muted-foreground"
                   }`}
                 >
-                  {skipEmail ? "✓ No Email" : "No Email"}
+                  {skipEmail ? "? No Email" : "No Email"}
                 </button>
               </div>
             </div>
@@ -652,12 +652,12 @@ export function NewOrderContent() {
           <div className='flex items-center justify-center gap-2 mt-4 text-xs sm:text-sm text-muted-foreground'>
             <div className='w-2 h-2 rounded-full bg-success' />
             <span>STATUS</span>
-            <span className='text-success font-medium'>● ONLINE</span>
+            <span className='text-success font-medium'>? ONLINE</span>
           </div>
         </div>
       )}
 
-      {/* ── Order Details Step ───────────────────────────────────────────── */}
+      {/* -- Order Details Step --------------------------------------------- */}
       {step === "order" && (
         <div className='max-w-7xl mx-auto'>
           <button onClick={goBack} className='flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 text-sm'>
@@ -681,7 +681,7 @@ export function NewOrderContent() {
                 <div className='text-left sm:text-right text-xs sm:text-sm text-muted-foreground flex-shrink-0'>
                   <p>Date</p>
                   <p className='font-medium text-foreground'>
-                    {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} • {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
+                    {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} � {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
                   </p>
                 </div>
               </div>
@@ -805,7 +805,7 @@ export function NewOrderContent() {
                 })()}
                 {bagCardNumber && (
                   <div className='mt-3 p-3 bg-success/10 border border-success/20 rounded-xl'>
-                    <p className='text-xs sm:text-sm text-success font-medium'>✓ Card #{bagCardNumber} selected - Give matching card to customer</p>
+                    <p className='text-xs sm:text-sm text-success font-medium'>? Card #{bagCardNumber} selected - Give matching card to customer</p>
                   </div>
                 )}
               </div>
@@ -842,10 +842,10 @@ export function NewOrderContent() {
                     <div className='flex items-center justify-between'>
                       <div>
                         <span className='text-xs text-foreground'>Extra Wash</span>
-                        {extraWashLoads > 0 && <span className='text-[10px] text-muted-foreground ml-1'>+₵{(extraWashUnitPrice * extraWashLoads).toFixed(2)}</span>}
+                        {extraWashLoads > 0 && <span className='text-[10px] text-muted-foreground ml-1'>+?{(extraWashUnitPrice * extraWashLoads).toFixed(2)}</span>}
                       </div>
                       <div className='flex items-center gap-1'>
-                        <button onClick={() => setExtraWashLoads(Math.max(0, extraWashLoads - 1))} className='w-5 h-5 rounded bg-muted flex items-center justify-center text-xs font-bold hover:bg-muted/80'>−</button>
+                        <button onClick={() => setExtraWashLoads(Math.max(0, extraWashLoads - 1))} className='w-5 h-5 rounded bg-muted flex items-center justify-center text-xs font-bold hover:bg-muted/80'>-</button>
                         <span className='text-xs font-bold w-4 text-center'>{extraWashLoads}</span>
                         <button onClick={() => setExtraWashLoads(extraWashLoads + 1)} className='w-5 h-5 rounded bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold'>+</button>
                       </div>
@@ -853,10 +853,10 @@ export function NewOrderContent() {
                     <div className='flex items-center justify-between'>
                       <div>
                         <span className='text-xs text-foreground'>Extra Dry</span>
-                        {extraDryLoads > 0 && <span className='text-[10px] text-muted-foreground ml-1'>+₵{(extraDryUnitPrice * extraDryLoads).toFixed(2)}</span>}
+                        {extraDryLoads > 0 && <span className='text-[10px] text-muted-foreground ml-1'>+?{(extraDryUnitPrice * extraDryLoads).toFixed(2)}</span>}
                       </div>
                       <div className='flex items-center gap-1'>
-                        <button onClick={() => setExtraDryLoads(Math.max(0, extraDryLoads - 1))} className='w-5 h-5 rounded bg-muted flex items-center justify-center text-xs font-bold hover:bg-muted/80'>−</button>
+                        <button onClick={() => setExtraDryLoads(Math.max(0, extraDryLoads - 1))} className='w-5 h-5 rounded bg-muted flex items-center justify-center text-xs font-bold hover:bg-muted/80'>-</button>
                         <span className='text-xs font-bold w-4 text-center'>{extraDryLoads}</span>
                         <button onClick={() => setExtraDryLoads(extraDryLoads + 1)} className='w-5 h-5 rounded bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold'>+</button>
                       </div>
@@ -872,31 +872,31 @@ export function NewOrderContent() {
                       ? selectedMachine.name
                       : selectedService?.name || services.find((s: any) => s.id === serviceType)?.name || "No service selected"}
                   </span>
-                  <span className='font-semibold text-foreground text-sm sm:text-base flex-shrink-0'>₵{(pricing?.totalPrice || 0).toFixed(2)}</span>
+                  <span className='font-semibold text-foreground text-sm sm:text-base flex-shrink-0'>?{(pricing?.totalPrice || 0).toFixed(2)}</span>
                 </div>
                 <div className='text-xs sm:text-sm text-muted-foreground pl-2'>
                   {selectedMachine ? (
-                    <>{Math.ceil(weight / 8)} load{Math.ceil(weight / 8) !== 1 ? "s" : ""} × ₵{selectedMachine.washPrice} wash
-                      {extraWashLoads > 0 && <span className='block text-primary'>+{extraWashLoads} extra wash × ₵{extraWashUnitPrice.toFixed(2)}</span>}
-                      {extraDryLoads > 0 && <span className='block text-primary'>+{extraDryLoads} extra dry × ₵{extraDryUnitPrice.toFixed(2)}</span>}
+                    <>{Math.ceil(weight / 8)} load{Math.ceil(weight / 8) !== 1 ? "s" : ""} � ?{selectedMachine.washPrice} wash
+                      {extraWashLoads > 0 && <span className='block text-primary'>+{extraWashLoads} extra wash � ?{extraWashUnitPrice.toFixed(2)}</span>}
+                      {extraDryLoads > 0 && <span className='block text-primary'>+{extraDryLoads} extra dry � ?{extraDryUnitPrice.toFixed(2)}</span>}
                     </>
                   ) : selectedService ? (
-                    <>{Math.ceil(weight / 8)} load{Math.ceil(weight / 8) !== 1 ? "s" : ""} × ₵{selectedService.basePrice.toFixed(2)}
-                      {extraWashLoads > 0 && <span className='block text-primary'>+{extraWashLoads} extra wash × ₵{effectiveWashPrice.toFixed(2)}</span>}
-                      {extraDryLoads > 0 && <span className='block text-primary'>+{extraDryLoads} extra dry × ₵{extraDryUnitPrice.toFixed(2)}</span>}
+                    <>{Math.ceil(weight / 8)} load{Math.ceil(weight / 8) !== 1 ? "s" : ""} � ?{selectedService.basePrice.toFixed(2)}
+                      {extraWashLoads > 0 && <span className='block text-primary'>+{extraWashLoads} extra wash � ?{effectiveWashPrice.toFixed(2)}</span>}
+                      {extraDryLoads > 0 && <span className='block text-primary'>+{extraDryLoads} extra dry � ?{extraDryUnitPrice.toFixed(2)}</span>}
                     </>
                   ) : null}
                 </div>
                 {isDelivery && deliveryFee > 0 && (
                   <div className='flex justify-between'>
-                    <span className='text-foreground flex items-center gap-1 text-sm sm:text-base'>🚚 Delivery Fee</span>
-                    <span className='text-foreground text-sm sm:text-base'>₵{deliveryFee.toFixed(2)}</span>
+                    <span className='text-foreground flex items-center gap-1 text-sm sm:text-base'>?? Delivery Fee</span>
+                    <span className='text-foreground text-sm sm:text-base'>?{deliveryFee.toFixed(2)}</span>
                   </div>
                 )}
                 {orderNotes.includes("Rush Service") && (
                   <div className='flex justify-between'>
                     <span className='text-foreground flex items-center gap-1 text-sm sm:text-base'>Rush Fee <Clock className='w-3 h-3 sm:w-4 sm:h-4' /></span>
-                    <span className='text-foreground text-sm sm:text-base'>₵{rushFee.toFixed(2)}</span>
+                    <span className='text-foreground text-sm sm:text-base'>?{rushFee.toFixed(2)}</span>
                   </div>
                 )}
               </div>
@@ -904,17 +904,17 @@ export function NewOrderContent() {
                 <div className='py-4 border-b border-border'>
                   <div className='flex justify-between text-xs sm:text-sm'>
                     <span className='text-muted-foreground'>Service Subtotal</span>
-                    <span className='text-foreground'>₵{(pricing?.subtotal || 0).toFixed(2)}</span>
+                    <span className='text-foreground'>?{(pricing?.subtotal || 0).toFixed(2)}</span>
                   </div>
                   <div className='flex justify-between text-xs sm:text-sm mt-1'>
                     <span className='text-muted-foreground'>Rush Fee</span>
-                    <span className='text-foreground'>₵{rushFee.toFixed(2)}</span>
+                    <span className='text-foreground'>?{rushFee.toFixed(2)}</span>
                   </div>
                 </div>
               )}
               <div className='flex justify-between items-center py-4'>
                 <span className='font-medium text-foreground text-sm sm:text-base'>Total</span>
-                <span className='text-2xl sm:text-3xl font-bold text-primary'>₵{finalTotal.toFixed(2)}</span>
+                <span className='text-2xl sm:text-3xl font-bold text-primary'>?{finalTotal.toFixed(2)}</span>
               </div>
               <Button
                 onClick={handleProceedToPayment}

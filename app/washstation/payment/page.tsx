@@ -118,7 +118,8 @@ function PaymentContent() {
   const hasLoyaltyReward = loyaltyPoints >= 10;
   const [useLoyalty, setUseLoyalty] = useState(false);
 
-  const voucherValidation = useQuery(
+  const voucherValidation = useQuery(
+
     (api as any).vouchers.validate,
     voucherCode.length >= 6 && order
       ? { code: voucherCode.toUpperCase(), orderTotal: order.totalPrice ?? 1, branchId: order.branchId }

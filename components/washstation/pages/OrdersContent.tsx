@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -44,9 +44,9 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 const DRIVER_STATUS_LABELS: Record<string, string> = {
-  pending_pickup: '⏳ Awaiting Driver',
-  picked_up: '🚚 In Transit',
-  delivered: '✓ Delivered',
+  pending_pickup: '? Awaiting Driver',
+  picked_up: '?? In Transit',
+  delivered: '? Delivered',
 }
 
 export function OrdersContent() {
@@ -94,7 +94,7 @@ export function OrdersContent() {
 
   if (!isSessionValid) return <LoadingSpinner text="Verifying session..." />
 
-  // ── List Panel ──────────────────────────────────────────────────────
+  // -- List Panel ------------------------------------------------------
   const ListPanel = (
     <div className={`${mobileView === 'list' ? 'flex' : 'hidden'} lg:flex w-full lg:w-80 border-r border-border bg-card flex-col flex-shrink-0 h-full`}>
       {/* Search */}
@@ -112,7 +112,7 @@ export function OrdersContent() {
         <div className="flex gap-1.5 flex-wrap">
           {[
             { key: 'all', label: 'All' },
-            { key: 'delivery', label: '🚚 Delivery' },
+            { key: 'delivery', label: '?? Delivery' },
             { key: 'ready', label: 'Ready' },
             { key: 'completed', label: 'Done' },
           ].map(f => (
@@ -163,11 +163,11 @@ export function OrdersContent() {
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="text-primary font-medium">#{order.orderNumber}</span>
-              <span>·</span>
+              <span>�</span>
               <span>{getServiceLabel(order.serviceType)}</span>
               {order.isDelivery && (
                 <>
-                  <span>·</span>
+                  <span>�</span>
                   <span className={`font-medium ${
                     (order as any).driverStatus === 'delivered' ? 'text-green-600' :
                     (order as any).driverStatus === 'picked_up' ? 'text-orange-500' :
@@ -175,7 +175,7 @@ export function OrdersContent() {
                   }`}>
                     {(order as any).driverStatus
                       ? DRIVER_STATUS_LABELS[(order as any).driverStatus]
-                      : '🚚 Delivery'}
+                      : '?? Delivery'}
                   </span>
                 </>
               )}
@@ -186,7 +186,7 @@ export function OrdersContent() {
     </div>
   )
 
-  // ── Detail Panel ────────────────────────────────────────────────────
+  // -- Detail Panel ----------------------------------------------------
   const DetailPanel = selectedOrder ? (
     <div className={`${mobileView === 'detail' ? 'flex' : 'hidden'} lg:flex flex-1 flex-col overflow-y-auto min-w-0`}>
       {/* Mobile back */}
@@ -223,7 +223,7 @@ export function OrdersContent() {
             </p>
           </div>
           <span className="text-xl font-bold text-primary">
-            ₵{(selectedOrder.finalPrice ?? 0).toFixed(2)}
+            ?{(selectedOrder.finalPrice ?? 0).toFixed(2)}
           </span>
         </div>
 
@@ -264,7 +264,7 @@ export function OrdersContent() {
           <div className="flex justify-between">
             <span className="text-muted-foreground">Payment</span>
             <span className={`font-medium ${selectedOrder.paymentStatus === 'paid' ? 'text-green-600' : 'text-orange-500'}`}>
-              {selectedOrder.paymentStatus === 'paid' ? '✓ Paid' : 'Pending'}
+              {selectedOrder.paymentStatus === 'paid' ? '? Paid' : 'Pending'}
             </span>
           </div>
           {selectedOrder.notes && (
@@ -302,7 +302,7 @@ export function OrdersContent() {
                         isActive ? 'bg-green-500 text-white' :
                         'bg-muted text-muted-foreground'
                       }`}>
-                        {isActive ? '✓' : i + 1}
+                        {isActive ? '?' : i + 1}
                       </div>
                       <p className={`text-xs text-center ${isActive ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
                         {stage.label}

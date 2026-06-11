@@ -1,4 +1,4 @@
-ï»¿'use client'
+'use client'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -118,7 +118,7 @@ export default function DriverLoginPage() {
         </Card>
 
         <p className="text-center text-muted-foreground text-sm mt-6">
-          Â© {new Date().getFullYear()} Rapid Wash Â· Powered by Lider Technologies LTD
+          © {new Date().getFullYear()} Rapid Wash · Powered by Lider Technologies LTD
         </p>
       </div>
     </div>

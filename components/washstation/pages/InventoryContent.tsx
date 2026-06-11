@@ -1,4 +1,4 @@
-ï»¿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -200,7 +200,7 @@ export function InventoryContent() {
                   <div className="text-xs">
                     <span className="text-blue-600">{item.scoopsPerUnit} scoops per {item.unit}</span>
                     {totalScoops !== null && (
-                      <span className="text-blue-800 dark:text-blue-300 font-semibold ml-2">â‰ˆ {totalScoops} scoops left</span>
+                      <span className="text-blue-800 dark:text-blue-300 font-semibold ml-2">˜ {totalScoops} scoops left</span>
                     )}
                   </div>
                 </div>
@@ -219,7 +219,7 @@ export function InventoryContent() {
                 <div className="p-2 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 rounded-lg mb-3 text-xs text-blue-700">
                   {item.expectedArrivalDate
                     ? `Expected: ${format(new Date(item.expectedArrivalDate), 'MMM d, yyyy')}`
-                    : 'Order request sent â€” awaiting admin'}
+                    : 'Order request sent — awaiting admin'}
                 </div>
               )}
 
@@ -253,7 +253,7 @@ export function InventoryContent() {
       <Dialog open={requestDialogOpen} onOpenChange={setRequestDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Request Order â€” {selectedItem?.name}</DialogTitle>
+            <DialogTitle>Request Order — {selectedItem?.name}</DialogTitle>
             <DialogDescription>
               This will notify the admin to place an order for this item.
               Current stock: <strong>{selectedItem?.currentStock} {selectedItem?.unit}</strong>
@@ -264,7 +264,7 @@ export function InventoryContent() {
               <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
                 <Droplets className="w-4 h-4 text-blue-500" />
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  â‰ˆ {Math.floor((selectedItem.currentStock || 0) * selectedItem.scoopsPerUnit)} scoops remaining
+                  ˜ {Math.floor((selectedItem.currentStock || 0) * selectedItem.scoopsPerUnit)} scoops remaining
                 </p>
               </div>
             )}
